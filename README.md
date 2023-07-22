@@ -2,77 +2,39 @@
  * @Author       : Bingqiang Zhou
  * @Date         : 2023-07-09 22:20:38
  * @LastEditors  : Bingqiang Zhou
- * @LastEditTime : 2023-07-23 01:05:11
+ * @LastEditTime : 2023-07-23 01:21:49
  * @Description  : 
 -->
 
 # ROS快速入门教程-笔记
 
-以下内容为观看bilibili网站视频：[机器人操作系统 ROS 快速入门教程](https://space.bilibili.com/411541289/channel/collectiondetail?sid=693700)时所做的笔记。
+以下内容为观看bilibili网站视频：[机器人操作系统 ROS 快速入门教程](https://space.bilibili.com/411541289/channel/collectiondetail?sid=693700)时所做的笔记。（暂时还没有实战演练，后续进行实战演练时，会加上实验过程以及遇到的问题）
 
 - [ROS快速入门教程-笔记](#ros快速入门教程-笔记)
   - [一、ROS是什么](#一ros是什么)
   - [二、零基础，如何学习机器人操作系统ROS](#二零基础如何学习机器人操作系统ros)
-    - [2.1、ROS版本选择](#21ros版本选择)
-    - [2.2、如何进行实践](#22如何进行实践)
-    - [2.3、学习建议](#23学习建议)
   - [三、学习ROS，安装Ubuntu，虚拟机和双系统如何选择](#三学习ros安装ubuntu虚拟机和双系统如何选择)
   - [四、从没接触过Ubuntu，如何上手ROS开发](#四从没接触过ubuntu如何上手ros开发)
   - [五、机器人操作系统ROS的安装心得以及rosdep问题的处理](#五机器人操作系统ros的安装心得以及rosdep问题的处理)
-    - [5.1、导入ROS安装步骤](#51导入ros安装步骤)
-    - [5.2、导入ROS安装源](#52导入ros安装源)
-    - [5.3、下载安装ROS](#53下载安装ros)
-    - [5.4、环境参数设置](#54环境参数设置)
-    - [5.5、rosdep初始化](#55rosdep初始化)
-    - [5.6、运行一些案例](#56运行一些案例)
   - [六、APT源，ROS的软件包应用商店](#六apt源ros的软件包应用商店)
   - [七、在Github上寻找安装ROS软件包](#七在github上寻找安装ros软件包)
   - [八、ROS开发神器VisualStudioCode的安装和设置](#八ros开发神器visualstudiocode的安装和设置)
   - [九、超级终端Terminator ROS开发得力助手](#九超级终端terminator-ros开发得力助手)
   - [十、ROS的基础单元：Node节点和Package包](#十ros的基础单元node节点和package包)
   - [十一、初学ROS，年轻人的第一个Node节点](#十一初学ros年轻人的第一个node节点)
-    - [11.1、创建Package软件包](#111创建package软件包)
-    - [11.2、构建第一个包的步骤](#112构建第一个包的步骤)
   - [十二、ROS的主要通讯方式：Topic话题与Message消息](#十二ros的主要通讯方式topic话题与message消息)
-    - [12.1、定义](#121定义)
-    - [12.2、外延补充](#122外延补充)
-    - [12.3、Message消息类型](#123message消息类型)
   - [十三、ROS中，使用C++编写Publisher发布者节点](#十三ros中使用c编写publisher发布者节点)
-    - [13.1、Publisher发布者的C++实现](#131publisher发布者的c实现)
-    - [13.2、常用工具/命令](#132常用工具命令)
   - [十四、ROS中，使用C++编写Subscriber订阅者节点](#十四ros中使用c编写subscriber订阅者节点)
-    - [14.1、Subscriber订阅者的C++实现](#141subscriber订阅者的c实现)
-    - [14.2、常用工具/命令](#142常用工具命令)
   - [十五、ROS中，使用launch文件一次启动多个节点](#十五ros中使用launch文件一次启动多个节点)
-    - [15.1、编写运行launch文件](#151编写运行launch文件)
-    - [15.2、launch文件小结](#152launch文件小结)
   - [十六、ROS中，使用Python编写Publisher发布者节点](#十六ros中使用python编写publisher发布者节点)
-    - [16.1、与用C++编写的软件包的不同](#161与用c编写的软件包的不同)
-    - [16.2、C++与Python编写发布者节点的步骤的不同](#162c与python编写发布者节点的步骤的不同)
-    - [16.3、Python编写Publisher发布者节点](#163python编写publisher发布者节点)
   - [十七、ROS中，使用Python编写Subscriber订阅者节点](#十七ros中使用python编写subscriber订阅者节点)
-    - [17.1、C++与Python编写订阅者节点的步骤的不同](#171c与python编写订阅者节点的步骤的不同)
-    - [17.2、Python编写Subscriber订阅者节点](#172python编写subscriber订阅者节点)
-    - [17.3、Python编写的软件包launch文件编写](#173python编写的软件包launch文件编写)
   - [十八、ROS机器人运动控制](#十八ros机器人运动控制)
-    - [18.1、矢量运动坐标系](#181矢量运动坐标系)
-    - [18.2、旋转运动坐标系](#182旋转运动坐标系)
-    - [18.3、速度控制消息包](#183速度控制消息包)
-    - [18.4、机器人运动控制流程](#184机器人运动控制流程)
   - [十九、ROS中，用C++实现机器人运动控制](#十九ros中用c实现机器人运动控制)
-    - [19.1、使用wpr\_simulation工程进行仿真](#191使用wpr_simulation工程进行仿真)
-    - [19.2、机器人运动控制实现思路](#192机器人运动控制实现思路)
   - [二十、在ROS中，使用Python编写运动控制功能](#二十在ros中使用python编写运动控制功能)
-    - [20.1、机器人运动控制实现思路](#201机器人运动控制实现思路)
   - [二十一、激光雷达工作原理](#二十一激光雷达工作原理)
-    - [21.1、激光雷达相关说明](#211激光雷达相关说明)
-    - [21.2、激光雷达工作原理](#212激光雷达工作原理)
   - [二十二、ROS中，使用RViz观测传感器数据](#二十二ros中使用rviz观测传感器数据)
-    - [22.1、`RViz`工具的介绍](#221rviz工具的介绍)
-    - [22.2、`Gazebo`与`RViz`区别与联系](#222gazebo与rviz区别与联系)
   - [二十三、ROS系统中的激光雷达消息包格式](#二十三ros系统中的激光雷达消息包格式)
   - [二十四、ROS中，用C++实现获取激光雷达数据](#二十四ros中用c实现获取激光雷达数据)
-    - [24.1、激光雷达数据获取流程](#241激光雷达数据获取流程)
   - [二十五、ROS中，用Python实现获取激光雷达数据](#二十五ros中用python实现获取激光雷达数据)
   - [二十六、ROS中，用C++实现激光雷达避障](#二十六ros中用c实现激光雷达避障)
   - [二十七、ROS中，用Python实现激光雷达避障](#二十七ros中用python实现激光雷达避障)
@@ -98,19 +60,19 @@
 
 ## 二、零基础，如何学习机器人操作系统ROS
 
-### 2.1、ROS版本选择
+**2.1、ROS版本选择**
 
 - 系统尽量选择Linux系统，如果机器比较新，最好还是选择较新版本的Linux，新版本对新的硬件支持会更好一些，尤其是对新的显卡和新的网卡的支持，更新Linux对ROS的支持也更新。
 - 条件允许（项目不是在旧的版本上做开发，硬件设备配置能支持），尽量选择最新版本，新版本对新的硬件支持更好。
 
 视频地址：[https://www.bilibili.com/video/BV1BP4y1o7pw](https://www.bilibili.com/video/BV1BP4y1o7pw)
 
-### 2.2、如何进行实践
+**2.2、如何进行实践**
 
 - 购买现成的机器人产品进行实验，一般厂商会提供一些基本的功能包，让机器人的硬件能在ROS系统中启动起来，（博主提供的一个Github仓库，包含了一些ROS功能包，是一个做机器人的公司提供的[https://github.com/6-robot](https://github.com/6-robot)）
 - 使用ROS自带的仿真平台进行实验。
 
-### 2.3、学习建议
+**2.3、学习建议**
 
 可以先跟着课程学一学，让机器人动起来，体验一下各种传感器和执行器在ROS中的使用，看看哪些功能符合咱们的需求，哪些功能可以改进，再明确下一步准备往哪个方向深入的学习，带着目的去学习，这样比较容易取得成效。
 
@@ -136,11 +98,11 @@
 
 ## 五、机器人操作系统ROS的安装心得以及rosdep问题的处理
 
-### 5.1、导入ROS安装步骤
+**5.1、导入ROS安装步骤**
 
 进入ROS官方网站[ros.org](https://www.ros.org)，进入到[Getting Started](https://www.ros.org/blog/getting-started/)页面，选择对应于`Ubuntu`版本的`ROS`，点击`install`，进入到官方安装文档中，接着一步一步操作即可。
 
-### 5.2、导入ROS安装源
+**5.2、导入ROS安装源**
 
 - 确保`Ubuntu Universe repository`软件源已经添加。**这里也可以改用国内的安装源。**
 
@@ -164,7 +126,7 @@ sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
 ```
 
-### 5.3、下载安装ROS
+**5.3、下载安装ROS**
 
 - 更新软件源列表以及现有包
   
@@ -192,7 +154,7 @@ sudo apt install ros-humble-ros-base
 sudo apt install ros-dev-tools
 ```
 
-### 5.4、环境参数设置
+**5.4、环境参数设置**
 
 ```bash
 # Replace ".bash" with your shell if you're not using bash
@@ -200,23 +162,23 @@ sudo apt install ros-dev-tools
 source /opt/ros/humble/setup.bash
 ```
 
-### 5.5、rosdep初始化
+**5.5、rosdep初始化**
 
 `ros2`中好像不需要了，暂时跳过。
 
 视频地址：[https://www.bilibili.com/video/BV1aP41137k9](https://www.bilibili.com/video/BV1aP41137k9)
 
-### 5.6、运行一些案例
+**5.6、运行一些案例**
 
 根据文档中给的案例来运行。
 
-## 六、APT源，ROS的软件包应用商店 
+## 六、APT源，ROS的软件包应用商店
 
 软件包网站入口[index.ros.org](https://index.ros.org)
 
 视频地址：[https://www.bilibili.com/video/BV1Xt4y177iW](https://www.bilibili.com/video/BV1Xt4y177iW)
 
-## 七、在Github上寻找安装ROS软件包 
+## 七、在Github上寻找安装ROS软件包
 
 在[Github](https:://github.com)上下载的ROS软件仓库，需要自己重新编译才能运行。
 
@@ -270,7 +232,7 @@ Node节点是ROS的基础单元，可以看作是实现了一个功能点（一�
 
 ## 十一、初学ROS，年轻人的第一个Node节点
 
-### 11.1、创建Package软件包
+**11.1、创建Package软件包**
 
 - 创建并进入`~/catkin_ws/src`文件夹里
 - `catkin_create_pkg`命令创建包：catkin_create_pkg<包名＞<依赖项列表>
@@ -280,7 +242,7 @@ Node节点是ROS的基础单元，可以看作是实现了一个功能点（一�
 
 `roscd`命令在终端中进入指定软件包的文件地址。
 
-### 11.2、构建第一个包的步骤
+**11.2、构建第一个包的步骤**
 
 1. 使用catkin _create_pkg创建一个软件包
 2. 在软件包的src文件夹下创建一个节点的cpp源码文件
@@ -294,7 +256,7 @@ Node节点是ROS的基础单元，可以看作是实现了一个功能点（一�
 
 ## 十二、ROS的主要通讯方式：Topic话题与Message消息
 
-### 12.1、定义
+**12.1、定义**
 
 关于Topic话题与Message消息的定义，总结为以下几点内容：
 
@@ -309,7 +271,7 @@ Node节点是ROS的基础单元，可以看作是实现了一个功能点（一�
 
 ![Topic与Message](Pictures/p05-Topic与Message.png)
 
-### 12.2、外延补充
+**12.2、外延补充**
 
 - 一个ROS节点网络中，可以同时存在多个话题
 - 一个话题可以有多个发布者，也可以有多个订阅者
@@ -319,7 +281,7 @@ Node节点是ROS的基础单元，可以看作是实现了一个功能点（一�
 
 ![Topic与Message](Pictures/p06-Topic与Message-2.png)
 
-### 12.3、Message消息类型
+**12.3、Message消息类型**
 
 可以在[index.ros.org](https://index.ros.org)网站中查看ROS提供的基础的消息类型`std_msgs`，也可以根据开发的需求自己定义Message
 
@@ -327,7 +289,7 @@ Node节点是ROS的基础单元，可以看作是实现了一个功能点（一�
 
 ## 十三、ROS中，使用C++编写Publisher发布者节点
 
-### 13.1、Publisher发布者的C++实现
+**13.1、Publisher发布者的C++实现**
 
 大致实现步骤如下：
 
@@ -371,7 +333,7 @@ int main(int argc, char *argv[])
 }
 ```
 
-### 13.2、常用工具/命令
+**13.2、常用工具/命令**
 
 - `rostopic`命令
   - `rostopic list`，列出当前系统中所有活跃着的话题
@@ -382,7 +344,7 @@ int main(int argc, char *argv[])
 
 ## 十四、ROS中，使用C++编写Subscriber订阅者节点
 
-### 14.1、Subscriber订阅者的C++实现
+**14.1、Subscriber订阅者的C++实现**
 
 大致实现步骤如下：
 
@@ -424,7 +386,7 @@ int main(int argc, char *argv[]){
 }
 ```
 
-### 14.2、常用工具/命令
+**14.2、常用工具/命令**
 
 - `rqt_graph`命令，图形化显示当前系统活跃的节点以及节点间的话题通讯关系
 
@@ -434,7 +396,7 @@ int main(int argc, char *argv[]){
 
 launch文件是遵循XML语法的描述文件，批量启动ROS节点是它的功能之一（还有其他功能这里暂时还不知道，后面再填一下这个坑）。
 
-### 15.1、编写运行launch文件
+**15.1、编写运行launch文件**
 
 launch文件只需要放在软件包下的文件夹（包括子目录）下即可，当我们使用指令启动launch文件时，会自动对指定软件包的目录进行逐层的遍历搜索。
 
@@ -454,7 +416,7 @@ launch文件只需要放在软件包下的文件夹（包括子目录）下即�
 </launch>
 ```
 
-### 15.2、launch文件小结
+**15.2、launch文件小结**
 
 - 使用`launch`文件，可以通过`roslaunch`指令一次启动多个节点。
 - 在`launch`文件中，为节点添加`output="screen"`属性，可以让节点信息输出到终端中。（ROS_WARN不受该属性控制）
@@ -464,11 +426,11 @@ launch文件只需要放在软件包下的文件夹（包括子目录）下即�
 
 ## 十六、ROS中，使用Python编写Publisher发布者节点
 
-### 16.1、与用C++编写的软件包的不同
+**16.1、与用C++编写的软件包的不同**
 
 python编写软件包，只需要在创建好软件包之后**编译一次**，即将新建的软件包加入到ROS软件包列表即可（让ROS能找到新建的软件包），后面无论是新增节点、修改已有节点，都不再需要再次编译，而C++在每次修改之后，都需要重新编译。
 
-### 16.2、C++与Python编写发布者节点的步骤的不同
+**16.2、C++与Python编写发布者节点的步骤的不同**
 
 C++与Python编写发布者节点的步骤非常相似，如下所示。
 
@@ -483,7 +445,7 @@ C++与Python编写发布者节点的步骤非常相似，如下所示。
   - 告诉ROS大管家rospy需要发布的话题名称，并白他索要能够发送消息包的发布对象pub
   - 开启一个while循环，不停的使用pub对象发布消息包
 
-### 16.3、Python编写Publisher发布者节点
+**16.3、Python编写Publisher发布者节点**
 
 - 在软件包目录下创建一个`scripts`文件夹，将python文件创建在这个文件夹下
 - 编写python代码
@@ -519,7 +481,7 @@ C++与Python编写发布者节点的步骤非常相似，如下所示。
 
 ## 十七、ROS中，使用Python编写Subscriber订阅者节点
 
-### 17.1、C++与Python编写订阅者节点的步骤的不同
+**17.1、C++与Python编写订阅者节点的步骤的不同**
 
 C++与Python编写订阅者节点的步骤非常相似，如下所示。
 
@@ -536,7 +498,7 @@ C++与Python编写订阅者节点的步骤非常相似，如下所示。
   - 告诉ROS大管家rospy需要订阅的话题名称，并设置接收消息包的回调函数
   - 调用ROS的spin()函数
 
-### 17.2、Python编写Subscriber订阅者节点
+**17.2、Python编写Subscriber订阅者节点**
 
 - 在软件包目录下创建一个`scripts`文件夹，将python文件创建在这个文件夹下
 - 编写python代码
@@ -561,7 +523,7 @@ C++与Python编写订阅者节点的步骤非常相似，如下所示。
 - 赋给Python文件可执行权限`chmod +x xx.py`
 - 运行节点`rosrun 包名  python文件`，命令类似`rosrun atr_pkg ma_node.py`
 
-### 17.3、Python编写的软件包launch文件编写
+**17.3、Python编写的软件包launch文件编写**
 
 `xx.launch`文件格式如下：
 
@@ -587,19 +549,19 @@ C++与Python编写订阅者节点的步骤非常相似，如下所示。
 
 ![矢量坐标系](Pictures/p07-机器人运动.jpg)
 
-### 18.1、矢量运动坐标系
+**18.1、矢量运动坐标系**
 
 以机器人底盘中心作为坐标系原地，伸出右手，以如下图所示，大拇指所指方向作为Z轴，食指所指方向作为X轴，中指所指方向作为Y轴。（运动单位为米每秒）
 
 ![矢量坐标系](Pictures/p08-矢量坐标系.jpg)
 
-### 18.2、旋转运动坐标系
+**18.2、旋转运动坐标系**
 
 伸出右手，大拇指指向X轴正方向，其他四个手指握拳的方向即是滚转运动的正方向，Y轴、Z轴类似，如下图所示。（运动单位为弧度每秒，$1$弧度 = $180 / \pi$ 度）
 
 ![旋转运动坐标系](Pictures/p09-旋转运动坐标系.jpg)
 
-### 18.3、速度控制消息包
+**18.3、速度控制消息包**
 
 可以在[index.ros.org](https://index.ros.org)中搜索`geometry_msgs`，查看速度控制消息包`Twist`消息，其中包含矢量速度`linear`，旋转速度`angular`。
 
@@ -608,7 +570,7 @@ Vector3  linear
 Vector3  angular
 ```
 
-### 18.4、机器人运动控制流程
+**18.4、机器人运动控制流程**
 
 速度控制节点发消息给速度控制话题`/cmd_vel`（约定俗成的名字）然后通过机器人核心节点控制机器人运动，如下图所示。
 
@@ -618,7 +580,7 @@ Vector3  angular
 
 ## 十九、ROS中，用C++实现机器人运动控制
 
-### 19.1、使用wpr_simulation工程进行仿真
+**19.1、使用wpr_simulation工程进行仿真**
 
 使用ROS仿真工程[wpr_simulation](https://github.com/6-robot/wpr_simulation)进行运动控制仿真。
 
@@ -629,7 +591,7 @@ Vector3  angular
 - 启动模拟器`roslaunch wpr_simulation wpb_simple.launch`
 - 运行运动控制的示例程序`rosrun wpr_simulation demo_vel_ctrl`
 
-### 19.2、机器人运动控制实现思路
+**19.2、机器人运动控制实现思路**
 
 大致思路如下：
 
@@ -675,7 +637,7 @@ int main(int argc, char *argv[]){
 
 没有机器人，使用仿真器进行仿真，过程可以查看[19.1、使用wpr\_simulation工程进行仿真](#191使用wpr_simulation工程进行仿真)。
 
-### 20.1、机器人运动控制实现思路
+**20.1、机器人运动控制实现思路**
 
 - 构建一个新的软件包，包名叫做vel_pkg
 - 在软件包中新建一个节点，节点名叫做vel_node.py
@@ -711,7 +673,7 @@ if __name__ == "__main__":
 
 ## 二十一、激光雷达工作原理
 
-### 21.1、激光雷达相关说明
+**21.1、激光雷达相关说明**
 
 - 主要作用：探测周围障碍物的分布情况
 - 按照测量维度分为：单线雷达、多线雷达
@@ -719,7 +681,7 @@ if __name__ == "__main__":
 - 按照工作方式分为：机械旋转雷达、固态雷达
 - 激光雷达的种类繁多，但是在ROS中呈现的数据格式是一样的，只是在数据完整度和精度上会有差异
 
-### 21.2、激光雷达工作原理
+**21.2、激光雷达工作原理**
 
 - 以TOF激光雷达为例，激光雷达分为两部分：固定底座、可旋转的头部结构，其中，在雷达的头部设置了一个红外激光的发射器和一个红外激光的接收器
 - 红外发射器发射一束激光，遇到障碍物会反射回来被红外接收器捕获，通过计时器测量激光发射和接收的间隔时长乘上光速就可以计算出来回的飞行距离，飞行距离除以2得到障碍物距离（`时间 x 光速 = 飞行距离，飞行距离 / 2 = 障碍物距离`）
@@ -730,7 +692,7 @@ if __name__ == "__main__":
 
 ## 二十二、ROS中，使用RViz观测传感器数据
 
-### 22.1、`RViz`工具的介绍
+**22.1、`RViz`工具的介绍**
 
 `RViz, (The Robot Visualization Tool)`是一个方便我们对机器人的状态进行实时观测的辅助工具（可视化），例如，可以将传感器采集到的数据以图形化的方式显示在软件中，另外，也可以将机器人运算处理的中间结果和即将要执行的目标指示可视化，比如，机器人对空间中某个物体进行识别之后，可以在软件中将其框选标注出来，又比如，显示机器人到某一个位置的路径规划。
 
@@ -738,7 +700,7 @@ if __name__ == "__main__":
 
 `roslaunch wpr_simulation wpb_rviz.launch`根据`Gazebo`仿真启动配置好的`rviz`界面
 
-### 22.2、`Gazebo`与`RViz`区别与联系
+**22.2、`Gazebo`与`RViz`区别与联系**
 
 - `Gazebo`是模拟真实机器人发出的传感器数据的工具，`RViz`是接受传感器数据并进行显示的工具
 - 在现实世界的机器人系统中，`Gazebo`是不存在的，`Gazebo`仿真的角色会被真实的实体机器人和真实的环境所代替
@@ -770,7 +732,7 @@ if __name__ == "__main__":
 
 该过程需要使用仿真器产生模拟的激光雷达数据，仿真器包配置过程可以查看[19.1、使用wpr\_simulation工程进行仿真](#191使用wpr_simulation工程进行仿真)。
 
-### 24.1、激光雷达数据获取流程
+**24.1、激光雷达数据获取流程**
 
 激光雷达数据获取流程如下图所示，激光雷达节点生成数据由模拟器生成，这里仅加入一个订阅者节点订阅雷达数据话题`/scan`即可。
 
