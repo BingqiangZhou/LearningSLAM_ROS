@@ -2,13 +2,13 @@
  * @Author       : Bingqiang Zhou
  * @Date         : 2023-07-09 22:20:38
  * @LastEditors  : Bingqiang Zhou
- * @LastEditTime : 2023-07-23 01:21:49
+ * @LastEditTime : 2023-07-27 19:20:09
  * @Description  : 
 -->
 
 # ROS快速入门教程-笔记
 
-以下内容为观看bilibili网站视频：[机器人操作系统 ROS 快速入门教程](https://space.bilibili.com/411541289/channel/collectiondetail?sid=693700)时所做的笔记。（暂时还没有实战演练，后续进行实战演练时，会加上实验过程以及遇到的问题）
+以下内容为观看bilibili网站视频：[机器人操作系统 ROS 快速入门教程](https://space.bilibili.com/411541289/channel/collectiondetail?sid=693700)时所做的笔记，前四十小节主要是ROS的内容，四十几小节之后是ROS中结合SLAM算法的简单应用，博主还在持续更新中。（暂时还没有实战演练，后续进行实战演练时，会加上实验过程以及遇到的问题）
 
 - [ROS快速入门教程-笔记](#ros快速入门教程-笔记)
   - [一、ROS是什么](#一ros是什么)
@@ -51,6 +51,15 @@
   - [三十八、ROS中的栅格地图格式](#三十八ros中的栅格地图格式)
   - [三十九、ROS中，使用C++发布自定义地图](#三十九ros中使用c发布自定义地图)
   - [四十、ROS中，使用Python发布自定义地图](#四十ros中使用python发布自定义地图)
+  - [四十一、SLAM的基本概念和原理](#四十一slam的基本概念和原理)
+  - [四十二、在ROS中，使用Hector Mapping软件包实现SLAM建图功能](#四十二在ros中使用hector-mapping软件包实现slam建图功能)
+  - [四十三、在ROS中，编写launch文件启动Hector Mapping](#四十三在ros中编写launch文件启动hector-mapping)
+  - [四十四、在launch文件中，为Hector Mapping设置建图参数](#四十四在launch文件中为hector-mapping设置建图参数)
+  - [四十五、初识ROS的TF系统](#四十五初识ros的tf系统)
+  - [四十六、里程计在激光雷达 SLAM 中的作用](#四十六里程计在激光雷达-slam-中的作用)
+  - [四十七、在仿真环境中使用Gmapping进行SLAM建图](#四十七在仿真环境中使用gmapping进行slam建图)
+  - [四十八、在ROS中，通过launch文件启动Gmapping进行SLAM建图](#四十八在ros中通过launch文件启动gmapping进行slam建图)
+  - [四十九、Gmapping建图的参数设置](#四十九gmapping建图的参数设置)
 
 ## 一、ROS是什么
 
@@ -916,28 +925,912 @@ if __name__ == "__main__":
     rospy.spin()
 ```
 
+视频地址：[https://www.bilibili.com/video/BV1Qa41137ki](https://www.bilibili.com/video/BV1Qa41137ki)
+
 ## 二十八、ROS中的IMU惯性测量单元消息包
+
+在[index.ros.org](https://index.ros.org)网站中，搜索`sensor_msgs`，再查看IMU(Inertial Measurement Unit)惯性单元消息包格式`Imu`，消息包内容如下所示，
+
+- std_msgs/Header header，消息包头，包含时间戳与坐标系id
+- geometry_msgs/Quaternion orientation，xyzw四元数，描述机器人空间姿态
+- float64[9] orientation_covariance，协方差矩阵
+- geometry_msgs/Vector3 angular_velocity，角速度
+- float64[9] angular_velocity_covariance，协方差矩阵
+- geometry_msgs/Vector3 linear_acceleration，矢量加速度
+- float64[9] linear_acceleration_covariance，协方差矩阵
+
+其中，
+
+- 加速度的数值单位是 米/秒^2，旋转速度的数值单位为 弧度/秒
+- 如果协方差数值已知，就将其填充到协方差矩阵中，若协方差数值未知，则将协方差矩阵全部置为零。
+- 若协方差矩阵对应的数值不存在(比如IMU没有输出orientation姿态数据)，那么该协方差矩阵的第一个数值置为-1。
+- 如果要使用这个消息包里的某个数据，需要先对其协方差矩阵的第一个数值进行一个判断:如果数值为-1，表明要使用的数据是不存在的，不要再去读取它。
+
+视频地址：[https://www.bilibili.com/video/BV1u94y1X7hF](https://www.bilibili.com/video/BV1u94y1X7hF)
 
 ## 二十九、ROS中，使用C++实现IMU数据获取
 
+**与IMU数据获取相关的三个通信话题**
+
+- `imu/data_raw` (消息包：`sensor_msgs/Imu`）
+  - 加速度计输出的矢量加速度 和 陀螺仪输出的旋转角速度
+- `imu/data` (消息包：`sensor_msgs/lmu`)
+  - `/imu/data_raw`的数据 再加上 融合后的四元数姿态描述
+- `imu/mag` (消息包：`sensor_msgs/MagneticField`)
+  - 磁强计输出磁强数据（九轴IMU）
+
+**IMU数据获取步骤**
+
+![IMU数据获取流程](Pictures/p13-IMU数据获取流程.jpg)
+
+- 构建一个新的软件包，包名叫做`imu_pkg`
+- 在软件包中新建一个节点，节点名叫做`imu_node`
+- 在节点中，向ROS大管家NodeHandle申请订阅话题`/imu/data`并设置回调函数为`IMUCallback()`
+- 构建回调函数`IMUCallback()`，用来接收和处理IMU数据
+- 使用TF工具将四元数转换成欧拉角
+- 调用`ROS_INFO()`显示转换后的欧拉角数值
+
+**示例代码**
+
+示例代码也可以在`wpr_simulation/src/demo_imu_data.cpp`中找到：
+
+```C++
+#include "ros/ros.h"
+#include "sensor_msgs/Imu.h"
+#include "tf/tf.h" // 坐标转换
+
+// IMU 回调函数
+void IMUCallback(const sensor_msgs::Imu msg)
+{
+    // 检测消息包中四元数数据是否存在
+    if(msg.orientation_covariance[0] < 0)
+        return;
+    // 四元数转成欧拉角
+    tf::Quaternion quaternion(
+        msg.orientation.x,
+        msg.orientation.y,
+        msg.orientation.z,
+        msg.orientation.w
+    );
+    double roll, pitch, yaw;
+    tf::Matrix3x3(quaternion).getRPY(roll, pitch, yaw);
+    // 弧度换算成角度
+    roll = roll*180/M_PI;
+    pitch = pitch*180/M_PI;
+    yaw = yaw*180/M_PI;
+    ROS_INFO("滚转= %.0f 俯仰= %.0f 朝向= %.0f", roll, pitch, yaw);
+}
+
+int main(int argc, char **argv)
+{
+    setlocale(LC_ALL, "");
+    ros::init(argc,argv, "imu_node"); 
+
+    ros::NodeHandle n;
+    // 订阅 IMU 的数据话题
+    ros::Subscriber sub = n.subscribe("imu/data", 100, IMUCallback);
+    ros::spin();
+
+    return 0;
+}
+```
+
+视频地址：[https://www.bilibili.com/video/BV1Ge4y1o7XS](https://www.bilibili.com/video/BV1Ge4y1o7XS)
+
 ## 三十、ROS中，使用Python实现IMU数据获取
+
+**IMU数据获取步骤**
+
+- 构建一个新的软件包，包名叫做imu_pkg
+- 在软件包中新建一个节点，节点名叫做imu_node.py
+- 在节点中，向ROS大管家rospy申请订阅话题/imu/data，回调函数为imu_callback()。
+- 构建回调函数imu_callback()， 用来接收和处理IMU数据
+- 使用TF工具将四元数转换成欧拉角，
+- 调用loginfo()显示转换后的欧拉角数值
+
+**示例代码**
+
+示例代码也可以在`wpr_simulation/scripts/demo_imu_data.py`中找到：
+
+```python
+#!/usr/bin/env python3
+# coding=utf-8
+
+import rospy
+from sensor_msgs.msg import Imu
+from tf.transformations import euler_from_quaternion
+import math
+
+# IMU 回调函数
+def imu_callback(msg):
+    if msg.orientation_covariance[0] < 0:
+        return
+    # 四元数转成欧拉角
+    quaternion = [
+        msg.orientation.x,
+        msg.orientation.y,
+        msg.orientation.z,
+        msg.orientation.w
+    ]
+    (roll,pitch,yaw) = euler_from_quaternion(quaternion)
+    # 弧度换算成角度
+    roll = roll*180/math.pi
+    pitch = pitch*180/math.pi
+    yaw = yaw*180/math.pi
+    rospy.loginfo("滚转= %.0f 俯仰= %.0f 朝向= %.0f", roll, pitch, yaw)
+
+# 主函数
+if __name__ == "__main__":
+    rospy.init_node("imu_node")
+    # 订阅 IMU 数据话题
+    imu_sub = rospy.Subscriber("/imu/data",Imu,imu_callback,queue_size=10)
+    rospy.spin()
+```
+
+视频地址：[https://www.bilibili.com/video/BV1cB4y137kh](https://www.bilibili.com/video/BV1cB4y137kh)
 
 ## 三十一、ROS中，用C++实现IMU航向锁定
 
+**IMU航向锁定流程**
+
+![IMU航向锁定流程](Pictures/p14-IMU航向锁定流程.jpg)
+
+- 让大管家 NodeHandle 发布速度控制话题`/cmd_vel`
+- 设定一个目标朝向角，当姿态信息中的朝向角和目标朝向角不一致时，控制机器人转向目标朝向角
+
+**示例代码**
+
+示例代码也可以在`wpr_simulation/src/demo_imu_behavior.cpp`中找到：
+
+```C++
+#include "ros/ros.h"
+#include "sensor_msgs/Imu.h"
+#include "tf/tf.h"
+#include "geometry_msgs/Twist.h"
+
+// 速度消息发布对象（全局变量）
+ros::Publisher vel_pub;
+
+// IMU 回调函数
+void IMUCallback(const sensor_msgs::Imu msg)
+{
+    // 检测消息包中四元数数据是否存在
+    if(msg.orientation_covariance[0] < 0)
+        return;
+    // 四元数转成欧拉角
+    tf::Quaternion quaternion(
+        msg.orientation.x,
+        msg.orientation.y,
+        msg.orientation.z,
+        msg.orientation.w
+    );
+    double roll, pitch, yaw;
+    tf::Matrix3x3(quaternion).getRPY(roll, pitch, yaw);
+    // 弧度换算成角度
+    roll = roll*180/M_PI;
+    pitch = pitch*180/M_PI;
+    yaw = yaw*180/M_PI;
+    ROS_INFO("滚转= %.0f 俯仰= %.0f 朝向= %.0f", roll, pitch, yaw);
+    // 速度消息包
+    geometry_msgs::Twist vel_cmd;
+    // 目标朝向角
+    double target_yaw = 90;
+    // 计算速度
+    double diff_angle = target_yaw - yaw;
+    vel_cmd.angular.z = diff_angle * 0.01;
+    vel_cmd.linear.x = 0.1;
+    vel_pub.publish(vel_cmd);
+}
+
+int main(int argc, char **argv)
+{
+    setlocale(LC_ALL, "");
+    ros::init(argc,argv, "demo_imu_behavior"); 
+
+    ros::NodeHandle n;
+    // 订阅 IMU 的数据话题
+    ros::Subscriber sub = n.subscribe("imu/data", 100, IMUCallback);
+    // 发布速度控制话题
+    vel_pub = n.advertise<geometry_msgs::Twist>("/cmd_vel",10);
+    ros::spin();
+
+    return 0;
+}
+```
+
+视频地址：[https://www.bilibili.com/video/BV1rU4y1z7Qs](https://www.bilibili.com/video/BV1rU4y1z7Qs)
+
 ## 三十二、ROS中，用Python实现IMU航向锁定
+
+**IMU航向锁定流程**
+
+- 让大管家 rospy 发布速度控制话题`/cmd_vel`
+- 设定一个目标朝向角，当姿态信息中的朝向角和目标朝向角不一致时，控制机器人转向目标朝向角
+
+**示例代码**
+
+示例代码也可以在`wpr_simulation/scripts/demo_imu_behavior.py`中找到：
+
+```Python
+#!/usr/bin/env python3
+# coding=utf-8
+
+import rospy
+from sensor_msgs.msg import Imu
+from tf.transformations import euler_from_quaternion
+import math
+from geometry_msgs.msg import Twist
+
+# IMU 回调函数
+def imu_callback(msg):
+    if msg.orientation_covariance[0] < 0:
+        return
+    # 四元数转成欧拉角
+    quaternion = [
+        msg.orientation.x,
+        msg.orientation.y,
+        msg.orientation.z,
+        msg.orientation.w
+    ]
+    (roll,pitch,yaw) = euler_from_quaternion(quaternion)
+    # 弧度换算成角度
+    roll = roll*180/math.pi
+    pitch = pitch*180/math.pi
+    yaw = yaw*180/math.pi
+    rospy.loginfo("滚转= %.0f 俯仰= %.0f 朝向= %.0f", roll, pitch, yaw)
+    # 速度消息包
+    vel_cmd = Twist()
+    # 目标朝向角
+    target_yaw = 90
+    # 计算速度
+    diff_angle = target_yaw - yaw
+    vel_cmd.angular.z = diff_angle * 0.01
+    vel_cmd.linear.x = 0.1
+    global vel_pub # 全局变量
+    vel_pub.publish(vel_cmd)
+
+# 主函数
+if __name__ == "__main__":
+    rospy.init_node("imu_behavior")
+    # 订阅 IMU 的数据话题
+    imu_sub = rospy.Subscriber("/imu/data",Imu,imu_callback,queue_size=10)
+    # 发布机器人运动控制话题
+    vel_pub = rospy.Publisher("cmd_vel",Twist,queue_size=10)
+    rospy.spin()
+```
+
+视频地址：[https://www.bilibili.com/video/BV1xW4y1B7c2](https://www.bilibili.com/video/BV1xW4y1B7c2)
 
 ## 三十三、ROS的标准消息包std_msgs
 
+消息包是ROS系统中数据流动的主要形式
+
+ROS消息包主要分为两个大类：标准消息包std_msgs、常用消息包common_msgs
+
+标准消息包std_msgs，可粗略的分为三个类别：基础类型、数组类型、结构体类型
+
+- 基础类型
+  - Bool
+  - Byte
+  - Char
+  - String
+  - Int8, Int16, Int32, Int64
+  - UInt8, UInt16, UInt32, UInt64
+  - Float32, Float64
+  - Empty (空类型，不传输任何数据，只是将消息包当作一个信号来处理)
+- 数组类型（可变长数组，直接往数组中push_back()即可，一般用于程序还没有完全定型时，定型之后一般会重新定义一个新的类型）
+  - ByteMultiArray
+  - Int8MultiArray, Int16MultiArray, Int32MultiArray, Int64MultiArray
+  - UInt8MultiArray, UInt16MultiArray, UInt32MultiArray, UInt64MultiArray
+  - Float32MultiArray, Float64MultiArray
+- 结构体类型
+  - ColorRGBA：图像像素结构体
+  - Duration：时间结构体，相对时间（时间差）
+  - Time：时间结构体，绝对时间
+  - Header：消息头，记录时间戳以及坐标系名称
+  - MultiArrayLayout
+  - MultiArrayDimension
+
+以上这些标准消息类型，既可以单独使用，也可以包含在复杂的消息类型中作为成员使用
+
+视频地址：[https://www.bilibili.com/video/BV1ia4y1f7E4](https://www.bilibili.com/video/BV1ia4y1f7E4)
+
 ## 三十四、ROS中的几何包geometry_msgs和传感器包sensor_msgs
+
+ROS消息包主要分为两个大类：标准消息包std_msgs、常用消息包common_msgs
+
+常用消息包common_msgs，包含以下九种消息包，最常用的是几何消息包geometry_msgs以及传感器消息包sensor_msgs
+
+- actionlib_msgs, 行为消息包，与ROS的Action通讯机制配合使用的消息类型
+- diagnostic_msgs, 诊断消息包，用于机器人自检
+- geometry_msgs, 几何消息包
+  - 加速度：Accel, AccelStamped, AccelWithCovariance, AccelWithCovarianceStamped
+  - 惯性：Inertia，InertiaStamped
+  - 空间点：Point, Point32, PointStamped
+  - 多边形：Polygon, PolygonStamped
+  - 空间位置：Pose, Pose2D, PoseArray, PoseStamped, PoseWithCovariance, PoseWithCovarianceStamped
+  - 四元数：Quaternion, QuaternionStamped
+  - 空间变换：Transform, TransformStamped
+  - 空间方向：Twist, TwistStamped, TwistWithCovariance, TwistWithCovarianceStamped
+  - 三维矢量：Vector3, Vector3Stamped
+  - 扭矩：Wrench, WrenchStamped
+- nav_msgs, 导航消息包
+- sensor_msgs, 传感器消息包
+  - 激光雷达：LaserScan, PointCloud2, LaserEcho, MultiEchoLaserScan
+  - 单点测距：Range (超声和红外测距传感器)
+  - 惯性测量：Imu, MagneticField
+  - 彩色相机：CameraInfo, Image, CompressedImage, RegionOfInterest
+  - 立体相机：CameraInfo, Image, ChannelFloat32, PointCloud, PointCloud2, PointField
+  - 温度测量：Temperature
+  - 湿度测量：RelativeHumidity
+  - 照度测量：Illuminance (光照强度)
+  - 流体压力：FluidPressure
+  - 全球定位：NavSatFix, NavSatStatus
+  - 运动关节：JointState, MultiDOFJointState
+  - 控制手柄：Joy, JoyFeedback, JoyFeedbackArray
+  - 电池状态：BatteryState
+  - 时钟源：TimeReference
+- shape_msgs, 形状消息包，用于描述多边形的信息
+- stereo_msgs, 双目视觉消息包，描述了双目图像的一些计算信息
+- trajectory_msgs, 运动轨迹消息包
+- visualization_msgs, 图形显示消息包，我们在Rviz中进行线条、文字以及各种标识和符号的显示就是用的这个消息包的消息类型
+
+其中，带有Stamped的消息包类型，都包含了一个header数据(时间和坐标系id)
+
+视频地址：[https://www.bilibili.com/video/BV1TB4y1V7Su](https://www.bilibili.com/video/BV1TB4y1V7Su)
 
 ## 三十五、ROS中生成自定义消息类型
 
+**生成自定义消息的步骤**
+
+- 创建新软件包，依赖项`message_generation`、`message_runtime`，例如：`catkin_create_pkg qq_msgs roscpp rospy std_msgs message_generation message_runtime`
+- 软件包添加`msg`目录，新建自定义消息文件，以`.msg`结尾
+- 在`CMakeLists.txt`中，将新建的`.msg`文件加入`add_message_files()`
+- 去掉`generate_messages()`注释符号，将依在`CMakeLists.txt`中，赖的其他消息包名称添加进去
+- 在`CMakeLists.txt`中，将`message_runtime`加入`catkin_package()`的`CATKIN DEPENDS`
+- 在`package.xml`中，将`message_generation`、`message_runtime`入`<build depend>`和`<exec depend>`
+- 编译软件包，生成新的自定义消息类型
+
+**消息包格式**
+
+```msg
+数据类型 变量名
+```
+
+**数据类型**
+
+- Bool、Byte、Char
+- String
+- Int8, Int16, Int32, Int64、UInt8, UInt16, UInt32, UInt64
+- Float32, Float64
+- Duration、Time
+- 可变长度数组array[]
+- 固定长度数组array[n]
+- 其他软件包定义的消息类型
+
+**查看新的消息类型是否已经加入到了ROS消息列表中**
+
+```bash
+rosmsg show 包名/消息名
+```
+
+例如：`rosmsg show qq_msgs/Carry`
+
+视频地址：[https://www.bilibili.com/video/BV1ZU4y1z7kN](https://www.bilibili.com/video/BV1ZU4y1z7kN)
+
 ## 三十六、ROS中使用自定义消息类型（C++节点）
+
+**新消息类型在C++节点的应用**
+
+- 在节点代码中，先`include`新消息类型的头文件，`#include<包名/新的消息类型名>`，例如`#include<qq_msgs/Carry>`
+- 在发布或订阅话题的时候，将话题中的消息类型设置为新的消息类型
+- 按照新的消息结构，对消息包进行赋值发送或读取解析
+- 在`CMakeList.txt`文件的`find_package()`中，添加新消息包名称作为依赖项
+- 在节点的编译规则中，添加一条`add_dependencies()`，将`新消息软件包名称_generate_messages_cpp`作为依赖项
+- 在`package.xml`中，将新消息包添加到`<build depend>`和`<exec depend>`中去
+- 运行`catkin_make`重新编译
+
+在使用上，基本上与基本消息包类似，只是需要设置能找到自定义消息包依赖就行
+
+视频地址：[https://www.bilibili.com/video/BV1zU4y1z7ZD](https://www.bilibili.com/video/BV1zU4y1z7ZD)
 
 ## 三十七、ROS中使用自定义消息类型（Python节点）
 
+**新消息类型在C++节点的应用**
+
+- 在节点代码中，先`import`新定义的消息类型，例如`from qq_msgs.msg import Carry`
+- 在发布或订阅话题的时候，将话题中的消息类型设置为新的消息类型
+- 按照新的消息结构，对消息包进行赋值发送或读取解析
+- 在`CMakeList.txt`文件`find_package()`中，添加新消息包名称作为依赖项
+- 在`package.xml`中，将新消息包添加到`<build depend>`和`<exec depend>`中去
+- 重新编译，确保软件包进入ROS的包列表中
+
+在使用上，基本上与基本消息包类似，只是需要设置能找到自定义消息包依赖就行
+
+视频地址：[https://www.bilibili.com/video/BV1Yd4y1X7rM](https://www.bilibili.com/video/BV1Yd4y1X7rM)
+
 ## 三十八、ROS中的栅格地图格式
+
+**ROS中的栅格地图**
+
+- ROS中的栅格地图是正方形小格子组成的地图，每一个格子里面填入一个数值表示障碍物占据情况。
+
+![ROS中的栅格地图](Pictures/p15-ROS中的栅格地图.jpg)
+
+- 由ROS中`map_server`节点发送数据到`/map`话题，数据类型为`nav_msgs::OccupancyFrid`（占据栅格）,一般用100表示有障碍物占据，0表示没有障碍物占据，-1表示为未知状态
+- 栅格的尺寸越小，区域划分的越精细，如下图所示，对于一个固定大小的地图来说，栅格越小，则栅格的数量就越多，也就意味着地图的数据量就越大，处理的时候，计算量就越大，因此，一般会给栅格边长（地图分辨率）设置为一个适当的尺寸（ROS中栅格地图的默认分辨率是0.05米）
+
+![ROS中的栅格地图分辨率](Pictures/p16-ROS中的栅格地图分辨率.png)
+
+**栅格地图消息格式**
+
+栅格地图消息`nav_msgs/OccupancyGrid.msg`可在[index.ros.org](https://index.ros.org/)中常用消息包`common_msgs`中的`nav_msgs`找到，消息内容如下
+
+- `std_msgs/Header header`, 消息头，包含时间戳以及坐标系id等
+- `nav_msgs/MapMetaData info`, 地图的参数信息，包括以下信息
+  - `time map_load_time`, 地图加载时间
+  - `float32 resolution`, 地图分辨率(单位：米/格)
+  - `uint32 width`, 地图宽度(单位：格)
+  - `uint32 height`, 地图高度(单位：格)
+  - `geometry_msgs/Pose origin`, 地图原点，即地图中(0, 0)栅格与真实世界原点的偏差量[m_x, m_y, rad] (位移偏差单位：米，角度偏差单位：弧度)
+- `int8[] data`, 地图的数据，按照行优先的顺序，如下做所示，从栅格矩阵（左下角）的(0, 0)位置开始排列，栅格障碍物占据值的取值范围从0到100，如果栅格的障碍物状况未知，则栅格数据为-1
+
+![ROS中的栅格地图数据](Pictures/p17-ROS中的栅格地图数据.png)
+
+在实际应用中，ROS中的栅格地图是经过SLAM算法之后得到的结果。
+
+视频地址：[https://www.bilibili.com/video/BV1uD4y1z74h](https://www.bilibili.com/video/BV1uD4y1z74h/)
 
 ## 三十九、ROS中，使用C++发布自定义地图
 
+**实现步骤**
+
+- 构建一个软件包`map_pkg`，依赖项里加上`nav_msgs`
+- 在`map_pkg`里创建一个节点`map_pub_node`
+- 在节点中发布话题`/map`，消息类型为`nav_msgs::OccupancyGrid`
+- 构建一个`nav_msgs::OccupancyGrid`地图消息包，并对其进行赋值将地图消息包发送到话题`/map`
+- 编译并运行节点
+- 启动`RViz`，订阅话题`/map`，显示地图
+
+**发布自定义地图节点示例代码**
+
+示例代码也可以在`wpr_simulation/src/demo_map_pub.cpp`中找到：
+
+```C++
+# include <iostream>
+# include <ros/ros.h>
+# include <nav_msgs/OccupancyGrid.h>
+
+int main(int argc, char** argv)
+{
+    ros::init(argc, argv, "map_pub_node");
+
+    ros::NodeHandle n;
+    ros::Publisher pub = n.advertise<nav_msgs::OccupancyGrid>("/map", 10);
+
+    ros::Rate r(1);
+    while (ros::ok())
+    {
+        nav_msgs::OccupancyGrid msg;
+        // header
+        msg.header.frame_id = "map";
+        msg.header.stamp = ros::Time::now();
+        // 地图描述信息
+        msg.info.origin.position.x = 0;
+        msg.info.origin.position.y = 0;
+        msg.info.resolution = 1.0;
+        msg.info.width = 4;
+        msg.info.height = 2;
+        // 地图数据
+        msg.data.resize(4*2);
+        msg.data[0] = 100;
+        msg.data[1] = 100;
+        msg.data[2] = 0;
+        msg.data[3] = -1;
+        // 发送
+        pub.publish(msg);
+        r.sleep();
+    }
+    return 0;
+}
+```
+
+**在RViz中显示栅格地图**
+
+- 启动`RViz`，命令行中输入`rviz`
+- 在`RViz`中添加一个坐标系`Axes`
+- 在`RViz`中添加一个地图`Map`，并订阅话题`/map`
+
+完成以上步骤，即可显示地图，如下图所示
+
+![在RViz中显示栅格地图](Pictures/p18-在Rviz中显示栅格地图.jpg)
+
+视频地址：[https://www.bilibili.com/video/BV1yG411G7ht](https://www.bilibili.com/video/BV1yG411G7ht)
+
 ## 四十、ROS中，使用Python发布自定义地图
+
+**实现步骤**
+
+- 构建一个软件包`map_pkg`，依赖项里加上`nav_msgs`
+- 编译软件包，让其进入ROS的包列表
+- 在`map_pkg`里创建一个节点`map_pub_node.py`在节点中发布话题`/map`，消息类型为`OccupancyGrid`
+- 构建一个`OccupancyGrid`地图消息包，并对其进行赋值将地图消息包发送到话题`/map`
+- 为节点`map_pub node.py`添加可执行权限
+- 运行`map_pub node.py`节点
+- 启动`RViz`，订阅话题`/map`，显示地图
+
+**发布自定义地图节点示例代码**
+
+示例代码也可以在`wpr_simulation/scripts/demo_map_pub.py`中找到：
+
+```Python
+#!/usr/bin/env python3
+# coding=utf-8
+
+import rospy
+from nav_msgs.msg import OccupancyGrid
+
+if __name__ == "__main__":
+    rospy.init_node("demo_map_pub")
+    # 发布地图话题
+    pub = rospy.Publisher("/map",OccupancyGrid,queue_size=10)
+    # 构建发送频率对象
+    rate = rospy.Rate(1)
+    while not rospy.is_shutdown():
+        # 构建地图消息包并赋值
+        msg = OccupancyGrid()
+        # header
+        msg.header.frame_id = "map"
+        msg.header.stamp = rospy.Time.now()
+        # 地图描述信息
+        msg.info.origin.position.x = 0
+        msg.info.origin.position.y = 0
+        msg.info.resolution = 1.0
+        msg.info.width = 4
+        msg.info.height = 2
+        # 地图数据
+        msg.data = [0]*4*2
+        msg.data[0] = 100
+        msg.data[1] = 100
+        msg.data[2] = 0
+        msg.data[3] = -1
+        pub.publish(msg)
+        rate.sleep()
+```
+
+视频地址：[https://www.bilibili.com/video/BV1hd4y1X75p](https://www.bilibili.com/video/BV1hd4y1X75p)
+
+## 四十一、SLAM的基本概念和原理
+
+SLAM, Simultaneous Localization And Mapping, 同时定位与地图构建，主要包括两个内容，定位与构图
+
+根据同一参照物的在不同观测点的视图中的位置，可以推断出观测点之间的相对位移（定位），还能得到新的参照物的在地图中的位置（构图），相当于对前一个局部地图进行了范围扩展
+
+在视觉SLAM中，参照物是特征点，而在实际应用中，参照物可以是二维码、颜色标记、电子标签
+
+- 定位：确定机器人在地图（世界坐标系）的位置
+- 构图：确定参照物在地图中的位置
+
+仅记录参照物的地图为特征地图，根据特征地图就可以完成导航任务
+
+博主讲的简单易懂，不仅有现实生活中的案例，还有激光雷达SLAM构建地图的动画与讲解，视频地址：[https://www.bilibili.com/video/BV1FW4y1M7PV](https://www.bilibili.com/video/BV1FW4y1M7PV)
+
+## 四十二、在ROS中，使用Hector Mapping软件包实现SLAM建图功能
+
+使用`Hector Mapping`软件包实现SLAM建图的步骤，如下图所示：
+
+不难发现的是`Hector Mapping`算法仅使用了激光雷达数据，并且该算法没有使用里程计（什么是里程计将在 [第四十六节-里程计在激光雷达 SLAM 中的作用](#四十六里程计在激光雷达-slam-中的作用) 中讲到）。
+
+![使用SLAM算法软件包实现建图](./Pictures/p19-使用SLAM算法软件包实现建图.jpg)
+
+**Hector Mapping API文档**
+
+在[index.ros.org](https://index.ros.rog)中搜索`hector_mapping`，可以查看相应ROS版本的文档，文档中描述了以下信息，这里不详细描述了，想进一步了解直接看文档吧：
+
+- 订阅与发布的话题以及相关消息数据包
+- 服务以及节点的参数
+- 需要提供的坐标变换以及算法输出的坐标变换信息
+
+**服务Service与话题Topic的不同**
+
+以上提到了服务Service，这里的服务也是一种通信机制，与发布/订阅话题的的不同是：
+
+- 订阅/发布话题是不同步的，发布者只管发布消息，不管有没有或有几个订阅者，也不管订阅者能不能跟得上自己的发布速度。订阅者则只管监听消息，不会告诉发布者听没听到。这种方式交换数据的效率高，但完全不具备应答功能
+- 服务是双向同步的信息传输，是具备应答功能的，当服务端收到服务请求后，会对请求做出响应，将数据的处理结果返回给客户端，服务调用非常适合那些只需要偶尔去做，并且会在有限的时间里完成的事
+
+参考博客链接：[服务 Service 详解](https://blog.csdn.net/zxxxiazai/article/details/108322219)
+
+**实现SLAM建图功能**
+
+- 使用`sudo apt install`安装`Hector Mapping`包
+- 运行ROS机器人核心和仿真环境
+- 运行`Hector Mapping`节点
+- 运行`RViz`可视化建图结果
+  - 添加机器人模型`RobotModel`
+  - 添加激光雷达`LaserScan`，订阅`/Scan`话题
+  - 添加地图`Map`，订阅`/Map`话题
+- 运行`rqt_robot_steering`速度控制工具，控制机器人把整个地图扫描完，实现SLAM建图
+
+视频地址：[https://www.bilibili.com/video/BV13g4y157R9](https://www.bilibili.com/video/BV13g4y157R9)
+
+## 四十三、在ROS中，编写launch文件启动Hector Mapping
+
+在实现SLAM建图功能时，需要启动多个节点以及launch文件，这里编写launch文件启动，更加方便一些。
+
+这里引用其他的launch文件，是通过`include`标签中的`file`属性进行引用，这里的`file`是要引用的launch文件的具体路径，这里也可以通过`rospack`指令来获取软件包的完整路径，语法为`$(find 软件包名称)`。
+
+另外，在启动`RViz`做可视化时，需要添加机器人模型`RobotModel`、激光雷达`LaserScan`等才能现实SLAM建图结果，因此这里将`RViz`的配置先保存下来，后面直接加载配置更加方便，命令`rosrun rviz rviz -d 配置文件路径`是加载`rviz`配置文件，这里对应到launch文件的设置是在`node`标签中加入一个`args`属性，属性值为`"-d 配置文件路径"`
+
+整个launch文件内容如下，也可以打开`wpr_simulation/launch/wpb_hector.launch`文件查看。
+
+```xml
+<launch>
+
+  <!-- 载入 机器人 和 SLAM 的仿真场景 -->
+  <include file="$(find wpr_simulation)/launch/wpb_stage_slam.launch"/>
+
+  <!-- Hector SLAM -->
+  <node pkg="hector_mapping" type="hector_mapping" name="hector_mapping" />
+
+  <!-- Rviz 显示 -->
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find wpr_simulation)/rviz/slam.rviz"/>
+
+  <!-- 运动控制 -->
+  <node pkg="rqt_robot_steering" type="rqt_robot_steering" name="rqt_robot_steering"/>
+
+</launch>
+```
+
+视频地址：[https://www.bilibili.com/video/BV1aV4y1C7wG](https://www.bilibili.com/video/BV1aV4y1C7wG)
+
+## 四十四、在launch文件中，为Hector Mapping设置建图参数
+
+在 [第四十二小节 - 在ROS中，使用Hector Mapping软件包实现SLAM建图功能](#四十二在ros中使用hector-mapping软件包实现slam建图功能) 中有说到，Hector Mapping节点提供了很多参数，不进行设置就会使用默认值，通过在`node`标签中添加`param`子标签可以实现参数设置，语法如下`<param name="参数名" value="参数值"/>`，如下方launch文件所示。
+```xml
+<launch>
+
+  <!-- 载入 机器人 和 SLAM 的仿真场景 -->
+  <include file="$(find wpr_simulation)/launch/wpb_stage_slam.launch"/>
+
+  <!-- Hector SLAM -->
+  <node pkg="hector_mapping" type="hector_mapping" name="hector_mapping" >
+      <!-- 地图更新的距离阈值，距离变化大于这个值，更新地图 -->
+      <param name="map_update_distance_thresh" value="0.4"/>
+      <!-- 地图更新的角度阈值，角度变化大于这个值，更新地图 -->
+      <param name="map_update_angle_thresh" value="0.9" />
+      <!-- 地图发布的时间间隔 -->
+      <param name="map_pub_period" value="0.2" /> 
+  </node>
+
+  <!-- Rviz 显示 -->
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find wpr_simulation)/rviz/slam.rviz"/>
+
+  <!-- 运动控制 -->
+  <node pkg="rqt_robot_steering" type="rqt_robot_steering" name="rqt_robot_steering"/>
+
+</launch>
+```
+
+**使用node标签中args属性与node子标签param设置参数的区别**
+
+- `args`属性一般是用于设置命令行启动节点参数
+- `param`标签一般是用于设置参数服务器parameter server中存储的参数
+
+参考博客链接：
+
+- [launch文件中param、rosparam以及arg之间的区别](https://blog.csdn.net/weixin_45777375/article/details/109445591)
+- [ROS向节点传递参数的方法总结](https://blog.csdn.net/u013834525/article/details/88744327)
+- [rosparam param env arg 的用法](https://www.cnblogs.com/marty86/p/7818658.html)
+
+**使用launch文件启动两个机器人查看设置不同参数值的区别**
+
+有时候，当仅有一个机器人时，设置不同的参数并不能很明显的看出差别来，为了更好的查看参数修改前后的变化，我们可以让两台机器人在同一场景中运行，分别进行SLAM建图，两者一对比就能看出差别来。
+
+![通过运行两个机器人查看设置不同参数的效果](Pictures/p20-通过运行两个机器人查看设置不同参数的效果.jpg)
+
+运行两个机器人的launch文件内容如下，也可以打开`wpr_simulation/launch/wpb_hector_comparison.launch`文件查看。
+
+- 创建了两个设置了不同参数的Hector_Mapping建图节点
+- 载入 SLAM 的仿真场景，并在场景中加入了两个并排的机器人（y轴作为分布为-0.3和0.3）
+- 运行运动控制节点`rqt_robot_steering`，并将速度控制数据分发给两个机器人（话题分流）
+
+```xml
+<launch>
+
+  <!-- 第一个 Hector_Mapping 建图节点 -->
+  <group ns="slam_1">
+    <node pkg="hector_mapping" type="hector_mapping" name="hector_mapping_1">
+
+      <param name="map_update_distance_thresh" value="0.4"/>
+      <param name="map_update_angle_thresh" value="0.9" />
+      <param name="map_pub_period" value="0.2" />
+      
+      <param name="map_frame" value="slam_1/map" />
+      <param name="base_frame" value="slam_1/base_footprint" />
+      <param name="odom_frame" value="slam_1/odom" />
+    </node>
+  </group>
+
+  <!-- 第二个 Hector_Mapping 建图节点 -->
+  <group ns="slam_2">
+    <node pkg="hector_mapping" type="hector_mapping" name="hector_mapping_2">
+
+      <param name="map_update_distance_thresh" value="0.1"/>
+      <param name="map_update_angle_thresh" value="0.1" />
+      <param name="map_pub_period" value="0.2" />
+
+      <param name="map_frame" value="slam_2/map" />
+      <param name="base_frame" value="slam_2/base_footprint" />
+      <param name="odom_frame" value="slam_2/odom" />
+    </node>
+  </group>
+
+  <!-- **************************** 分割线 **************************** -->
+
+  <!-- 载入 SLAM 的仿真场景 -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+  <arg name="world_name" value="$(find wpr_simulation)/worlds/slam_simple.world"/>
+  <arg name="paused" value="false"/>
+  <arg name="use_sim_time" value="true"/>
+  <arg name="gui" value="true"/>
+  <arg name="recording" value="false"/>
+  <arg name="debug" value="false"/>
+  </include>
+
+  <!-- 载入 1号机器人 -->
+  <include file="$(find wpr_simulation)/launch/wpb_slam_template.launch">
+      <arg name="robot_namespace" value="slam_1" /> 
+      <arg name="local_x" value="0" /> 
+      <arg name="local_y" value="-0.3" /> 
+      <arg name="local_yaw" value="0" /> 
+  </include>
+
+  <!-- 载入 2号机器人 -->
+  <include file="$(find wpr_simulation)/launch/wpb_slam_template.launch">
+      <arg name="robot_namespace" value="slam_2" /> 
+      <arg name="local_x" value="0" /> 
+      <arg name="local_y" value="0.3" /> 
+      <arg name="local_yaw" value="0" /> 
+  </include>
+
+  <!-- 运动控制 -->
+  <node pkg="rqt_robot_steering" type="rqt_robot_steering" name="rqt_robot_steering"/>
+
+  <!-- 速度话题分流 -->
+  <node pkg = "topic_tools" type = "relay" name = "relay_1" args="/cmd_vel /slam_1/cmd_vel" />
+  <node pkg = "topic_tools" type = "relay" name = "relay_2" args="/cmd_vel /slam_2/cmd_vel" />
+
+</launch>
+```
+
+**两个机器人分布设置不同参数值的效果的区别**
+
+设置的距离与角度更新阈值更小的机器人，地图更新更快，如下图所示。
+
+![通过运行两个机器人查看设置不同参数的效果](Pictures/p21-两个机器人设置不同参数的效果.jpg)
+
+视频地址：[https://www.bilibili.com/video/BV1dT4114741](https://www.bilibili.com/video/BV1dT4114741)
+
+## 四十五、初识ROS的TF系统
+
+TF是TransForm的缩写，指的是坐标变换，如下图所示，世界坐标系(map，一般是机器人运动的起点)与机器人(base_footprint，一般是机器人底盘中心)坐标系之间就存在一种变换关系：
+
+![坐标系之间的变换](Pictures/p22-坐标系之间的变换.jpg)
+
+**ROS的TF系统**
+
+在ROS中，TF发布节点，发布TF关系到`/tf`话题中，TF订阅节点就可以通过订阅`/tf`话题查询知道有那些坐标系以及坐标系之间的空间关系，例如`RViz`能够现实地图与机器人的相对位置，就是`RViz`订阅了`/tf`话题，在`RViz`中甚至可以显示各个TF坐标系。
+
+![ROS中的TF系统](Pictures/p23-ROS中的TF系统.jpg)
+
+**RViz中显示TF坐标系**
+
+在`RViz`中添加TF坐标系，并在Frames可以看到当前存在的所有坐标系。
+
+![RViz中显示TF坐标系](Pictures/p24-RViz中显示TF坐标系.jpg))
+
+**TF消息包类型**
+
+通过命令`rostopic type 话题名称`可查看话题消息包类型，`/tf`话题的消息格式是`tf2_msgs/TFMessage`，通过[index.ros.org](https://index.ros.org)查找`tf2_msgs`包中的`TFMessage`，发现消息包数据类型是`geometry_msgs/TransformStamped[] transforms`，
+
+- `geometry_msgs/TransformStamped`，TFMessage中的数据类型
+  - `std_msgs/Header header`，消息头，包括时间戳以及父坐标系的名称等
+  - `string child_frame_id`，子坐标系的名称
+  - `geometry_msgs/Transform transform`，子坐标系相对于父坐标系的变换关系
+    - `geometry_msgs/Vector3 translation`，子坐标系在父坐标系中xyz的偏移量
+    - `geometry_msgs/Quaternion rotation`，子坐标系在父坐标系中角度偏差量（四元数格式）
+
+**通过运行`rqt_tf_tree`节点可查看坐标系之间的父子关系**
+
+运行命令`rosrun rqt_tf_tree rqt_tf_tree`
+
+![tf_tree查看坐标系关系](Pictures/p25-tf_tree查看坐标系关系.jpg)
+
+视频地址：[https://www.bilibili.com/video/BV1uh4y1377t](https://www.bilibili.com/video/BV1uh4y1377t)
+
+## 四十六、里程计在激光雷达 SLAM 中的作用
+
+之前提到`Hector Mapping`算法中没有使用里程计(odometry)，只使用雷达点云和障碍物配准的方法来进行定位，这导致进入到一个特征相似的场景之后，会使得算法认为机器人没有移动了，例如，在长直的走廊，每次得到的激光雷达数据都是左右的两面墙，这个时候就需要加上里程计，让算法知道机器人还在走以及走过的距离。
+
+里程计(odometry)在驱动节点中实现，发送到`/tf`话题中（在`tf_tree`中的`odom`坐标系）
+
+![里程计消息](Pictures/p26-里程计消息.jpg)
+
+里程计输出的位置信息，通过电机转速计算而来，只是一个理论值，在实际机器人运动中，可能存在机器人轮子打滑的情况，而这种情况就和实际的情况会存在一些偏差，而且随着运动的进行，误差会不断累加，这样就需要修正一下它（例如通过激光雷达点云的匹配修正位置，如下图所示），修正里程计误差的算法就是`Gmapping`的核心算法。
+
+![激光雷达点云修正1](Pictures/p27-激光雷达点云修正1.jpg)
+![激光雷达点云修正2](Pictures/p27-激光雷达点云修正2.jpg)
+
+在里程计的帮助下，激光雷达SLAM可以有效的克服了建图过程中位移特征缺失的问题。在实际的应用中，里程计的形式可能多种多样，甚至连SLAM输出的定位信息，都可能作为另外一个SLAM系统所需要的里程计，但是无论是什么样的形式，里程计的思想，归根结底，就是利用不同形式的定位方法去克服某种单一SLAM算法的缺陷，减少误差或者增加稳定性。
+
+视频地址：[https://www.bilibili.com/video/BV1ih4y177QK](https://www.bilibili.com/video/BV1ih4y177QK)
+
+## 四十七、在仿真环境中使用Gmapping进行SLAM建图
+
+在[index.ros.org](https://index.ros.rog)中搜索`gmapping`，可以查看相应ROS版本的文档，通过文档知道，我们需要订阅`/tf`话题以及`/scan`话题，即需要提供 激光雷达数据 以及 激光雷达坐标系到底盘坐标系`base_link`的变换和底盘坐标系`base_link`到`odom`坐标系的变换（即里程计输出的TF变换）。
+
+这里雷达坐标系的名称可以查看`/scan`话题中雷达数据包中的frame_id。
+
+确认了输入之后，就可以运行Gmapping节点输出建图了。`rosrun gmapping slam_gmapping`
+
+视频地址：[https://www.bilibili.com/video/BV1LV411T7Pm](https://www.bilibili.com/video/BV1LV411T7Pm)
+
+## 四十八、在ROS中，通过launch文件启动Gmapping进行SLAM建图
+
+使用launch文件启动多个节点，前面已经做过多次，这里不再赘述了。可以看视频或者是[第四十三小节-在ROS中，编写launch文件启动Hector Mapping](#四十三在ros中编写launch文件启动hector-mapping)。
+下面直接贴出，launch文件的内容，可直接查看`wpr_simulation/launch/wpb_corridor_gmapping.launch`文件内容。
+
+```xml
+<launch>
+
+  <!-- 载入 机器人 和 长走廊 的仿真场景 -->
+  <include file="$(find wpr_simulation)/launch/wpb_stage_corridor.launch"/>
+
+  <!-- Gmapping -->
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping"/>
+
+  <!-- Rviz -->
+  <arg name="rvizconfig" default="$(find wpr_simulation)/rviz/corridor.rviz" />
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+
+  <!-- 运动控制 -->
+  <node pkg="rqt_robot_steering" type="rqt_robot_steering" name="rqt_robot_steering"/>
+
+</launch>
+```
+
+视频地址：[https://www.bilibili.com/video/BV1wF411Q7Q3](https://www.bilibili.com/video/BV1wF411Q7Q3)
+
+## 四十九、Gmapping建图的参数设置
+
+`gmapping`的参数大致分为三类：
+
+- **接口相关参数**，跟仿真或者是实体机器人对接的一些参数，例如底盘坐标系的名称、地图坐标系名称、里程计坐标系名称等。
+- **性能相关参数**，涉及到对CPU和内存的消耗
+- **算法相关参数**，对算法本身进行调优的参数
+
+一般调整前两种参数（接口相关参数 和 性能相关参数），使用默认的算法相关参数，即可适用于大多数的环境情况。如果需要调整算法相关参数，则需要对算法有比较深入的了解。
+
+性能相关参数可能包括以下内容，具体说明可以查看视频或者文档：
+
+- 地图尺寸
+  - 地图的大小，地图越大，占用的内存越多
+  - 地图分辨率，地图分辨率越小，占用内存越多
+  - ……
+- 激光雷达
+  - 最大有效距离
+  - 最大采纳距离
+  - 跳线距离
+  - 数据跳帧处理
+  - ……
+- 地图更新
+  - 更新时间间隔
+  - 移动距离阈值
+  - 旋转角度距离阈值
+  - ……
+- 定义相关
+- ……
+
+launch文件的编写，这里不再赘述了，可以看视频或者是[第四十四小节-在launch文件中，为Hector Mapping设置建图参数](#四十四在launch文件中为hector-mapping设置建图参数)。
+
+视频地址：[https://www.bilibili.com/video/BV1Kc411F7se](https://www.bilibili.com/video/BV1Kc411F7se)
