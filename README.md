@@ -2,7 +2,7 @@
  * @Author       : Bingqiang Zhou
  * @Date         : 2023-07-09 22:20:38
  * @LastEditors  : Bingqiang Zhou
- * @LastEditTime : 2023-08-03 20:46:09
+ * @LastEditTime : 2023-08-04 02:23:12
  * @Description  : 
 -->
 
@@ -10,7 +10,7 @@
 
 以下内容为观看bilibili网站视频：[机器人操作系统 ROS 快速入门教程](https://space.bilibili.com/411541289/channel/collectiondetail?sid=693700)时所做的笔记，前四十小节主要是ROS的内容，第四十一小节以及之后的小节是ROS中结合SLAM算法的简单应用，博主还在持续更新中。（暂时还没有实战演练，后续进行实战演练时，会加上实验过程以及遇到的问题）
 
-最近开始学习SLAM了，在看了ROS快速入门教程视频之后，尝试跑了一下开源项目[R3live](https://github.com/hku-mars/r3live)，跑通的过程记录在[RunR3liveProject.md](./RunR3liveProject.md)
+最近开始学习SLAM了，在看了ROS快速入门教程视频之后，尝试跑了一下开源项目[R3live](https://github.com/hku-mars/r3live)，跑通的过程记录在[RunR3liveProject.md](./Others/RunR3liveProject.md)中
 
 - [ROS快速入门教程-笔记](#ros快速入门教程-笔记)
   - [一、ROS是什么](#一ros是什么)
