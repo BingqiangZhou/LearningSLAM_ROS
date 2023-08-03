@@ -2,7 +2,7 @@
  * @Author       : Bingqiang Zhou
  * @Date         : 2023-08-03 20:42:54
  * @LastEditors  : Bingqiang Zhou
- * @LastEditTime : 2023-08-04 02:17:11
+ * @LastEditTime : 2023-08-04 02:29:52
  * @Description  : 
 -->
 # 开源项目R3live的配置与运行
@@ -52,11 +52,11 @@ R3live是香港大学MARS实验室以Livox雷达为核心做的多传感器融�
 
 - 打开`Software & Updates`(紫色图标)，注意不是右边的`Software Update`(灰色图标)
 
-![Software and updates](./Pictures/Ubuntu%20Software%20and%20Update.png)
+![Software and updates](RunR3liveProject/Pictures/Ubuntu%20Software%20and%20Update.png)
 
 - 将下载来源改为阿里云，如下图所示
 
-![Configure your Ubuntu repositories](Pictures/Configure%20your%20Ubuntu%20repositories.png)
+![Configure your Ubuntu repositories](./RunR3liveProject/Pictures/Configure%20your%20Ubuntu%20repositories.png)
 
 ### 1.2、设置软件源
 
@@ -97,7 +97,7 @@ sudo apt update
 sudo apt install ros-noetic-desktop-full
 ```
 
-![ROS package](Pictures/ROS%20package.png)
+![ROS package](./RunR3liveProject/Pictures/ROS%20package.png)
 
 ### 1.5、配置ROS环境
 
@@ -176,7 +176,7 @@ sudo make install
 
 在虚拟机下运行或者是没有livox雷达，看到如下输出之后，认为SDK已正确安装，这个时候，可以`control + c`退出示例程序了
 
-![livox SDK](Pictures/livox%20SDK.png)
+![livox SDK](./RunR3liveProject/Pictures/livox%20SDK.png)
 
 ### 2.3、创建ROS工作路径
 
@@ -348,7 +348,7 @@ sudo make install
 
     在文件中加上一行`include /usr/loacal/lib`，这个路径是cmake编译时填的动态库安装路径加上`/lib`
 
-    ![OpenCV Config](Pictures/OpenCV%20Config.png)
+    ![OpenCV Config](./RunR3liveProject/Pictures/OpenCV%20Config.png)
 
 ### 4.6、将OpenCV库配置到系统环境中
 
@@ -391,7 +391,7 @@ pkg-config --modversion opencv
 
 这时会发现，找不到`opencv.pc`
 
-![opencv pc](Pictures/opencv%20pc.png)
+![opencv pc](./RunR3liveProject/Pictures/opencv%20pc.png)
 
 为了让系统找OpenCV包时，直接找到OpenCV 4.x包（拷贝`opencv4.pc`为`opencv.pc`，并配置`pkg-config`）
 
@@ -413,7 +413,7 @@ pkg-config --cflags --libs opencv
 sudo apt-get purge '*opencv*'
 ```
 
-![r3live issue 20](./Pictures/r3live%20issue%2020.png)
+![r3live issue 20](./RunR3liveProject/Pictures/r3live%20issue%2020.png)
 
 ---
 参考链接：
@@ -483,7 +483,7 @@ export LIBGL_ALWAYS_SOFTWARE=1
 
 修改`r3live/src/rgb_map`文件夹中，`pointcloud_rgbd.cpp`中的光流模块image的buffer的分配的大小。
 
-![r3live issue 11](Pictures/r3live%20issue%2011.png)
+![r3live issue 11](./RunR3liveProject/Pictures/r3live%20issue%2011.png)
 
 上图中说的168行并不准确，因为代码不是最新的，作者已针对内存小于12GB的机器，改小了buffer大小(`1e8`)，大于12GB的设备还是`1e9`。在最新代码(日期20230803)中的177行[r3live/src/rgb_map/pointcloud_rgbd.cpp#L177](https://github.com/hku-mars/r3live/blob/6143a38537f28cb36eb24e9bbe2e39c8f7967157/r3live/src/rgb_map/pointcloud_rgbd.cpp#L177)
 
