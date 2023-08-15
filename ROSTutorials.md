@@ -2,7 +2,7 @@
  * @Author       : Bingqiang Zhou
  * @Date         : 2023-07-09 22:20:38
  * @LastEditors  : Bingqiang Zhou
- * @LastEditTime : 2023-08-04 02:45:18
+ * @LastEditTime : 2023-08-15 22:23:08
  * @Description  : 
 -->
 
@@ -60,6 +60,7 @@
   - [四十七、在仿真环境中使用Gmapping进行SLAM建图](#四十七在仿真环境中使用gmapping进行slam建图)
   - [四十八、在ROS中，通过launch文件启动Gmapping进行SLAM建图](#四十八在ros中通过launch文件启动gmapping进行slam建图)
   - [四十九、Gmapping建图的参数设置](#四十九gmapping建图的参数设置)
+  - [五十、在ROS中对SLAM创建的地图进行保存和加载](#五十在ros中对slam创建的地图进行保存和加载)
 
 ## 一、ROS是什么
 
@@ -1834,3 +1835,70 @@ TF是TransForm的缩写，指的是坐标变换，如下图所示，世界坐标
 launch文件的编写，这里不再赘述了，可以看视频或者是[第四十四小节-在launch文件中，为Hector Mapping设置建图参数](#四十四在launch文件中为hector-mapping设置建图参数)。
 
 视频地址：[https://www.bilibili.com/video/BV1Kc411F7se](https://www.bilibili.com/video/BV1Kc411F7se)
+
+## 五十、在ROS中对SLAM创建的地图进行保存和加载
+
+在ROS中`map_server`可以将SLAM建好的图保存下来，也可以将其加载出来。在[index.ros.org](https://index.ros.org)中搜索`map_server`可以查看[map_server相关说明](http://wiki.ros.org/map_server)
+
+**保存地图**
+
+在SLAM算法构建完算法之后，或者是当前已有地图之后，可以通过运行`map_server`包`map_saver`节点保存地图，命令相关参数如下：
+
+```bash
+rosrun map_server map_saver [--occ <threshold_occupied>] [--free <threshold_free>] [-f <mapname>] map:=/your/costmap/topic
+```
+
+其中：
+
+- `--occ <occupied_thresh>`: 当占据比例超过该阈值时，认为栅格为完全占据（有障碍物）
+- `--free <threshold_free>`: 当占据比例小于该阈值时，认为栅格为空白（没有障碍物）
+- `-f <mapname>`: 保存的map名，地图会被保存为配置文件`<mapname>.yaml`与地图图像`<mapname>.pgm`（像素值对应于地图被占据的情况）
+- `map:=/your/costmap/topic`: 发送地图数据的主题`topic`，默认是`/map`
+
+这里`--occ`、`--free`参数以及地图图片的生成，涉及到插值，具体可以查看[map_server文档](http://wiki.ros.org/map_server)
+
+`map_server map_saver`运行案例：
+
+```bash
+rosrun map_server map_saver -f mymap 
+
+rosrun map_server map_saver --occ 90 --free 10 -f mymap map:=/move_base/global_costmap/costmap
+```
+
+**保存的地图的内容**
+
+- `.yaml`配置文件
+
+  ```yaml
+  image: testmap.png # 对应的地图图像文件
+  resolution: 0.1 # 地图分辨率（米/像素）
+  origin: [0.0, 0.0, 0.0] # 图像左下角在地图的坐标以及逆时针旋转角度(x, y, yaw)
+  occupied_thresh: 0.65 # 栅格被占据最小比例阈值
+  free_thresh: 0.196 # 栅格空闲最大比例阈值
+  negate: 0 # 图像取反（即被占据occupied/未知black free/空闲white）三个语义状态取反
+  ```
+  
+- `.pgm`地图图像文件
+
+知识复习：
+
+- 滚转角(roll)：关于X轴的旋转（X轴不动）
+- 俯仰角(pitch)：关于Y轴的旋转（Y轴不动）
+- 航向角(yaw)：关于Z轴的旋转（Z轴不动）
+
+**加载地图**
+
+使用`map_server`包的`map_server`节点，再加上保存下来的map的配置文件即可加载地图文件，命令格式如下：
+
+```bash
+rosrun map_server map_server <map.yaml>
+```
+
+`map_server map_server`运行案例：
+
+```bash
+rosrun map_server map_server mymap.yaml
+```
+
+这里可以运行`RViz`加入`map`并订阅`/map`话题（或者是保存map时设置的话题），即可加载查看地图。
+
