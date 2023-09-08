@@ -2,7 +2,7 @@
  * @Author       : Bingqiang Zhou
  * @Date         : 2023-08-03 20:42:54
  * @LastEditors  : Bingqiang Zhou
- * @LastEditTime : 2023-08-04 02:29:52
+ * @LastEditTime : 2023-09-09 00:46:00
  * @Description  : 
 -->
 # 开源项目R3live的配置与运行
@@ -274,7 +274,7 @@ cd ~
 
 wget https://github.com/opencv/opencv/archive/4.5.3.zip
 
-unzip opencv-4.5.3.zip
+unzip 4.5.3.zip
 ```
 
 ### 4.2、生成makefile文件
