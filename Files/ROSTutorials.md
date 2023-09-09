@@ -2,7 +2,7 @@
  * @Author       : Bingqiang Zhou
  * @Date         : 2023-07-09 22:20:38
  * @LastEditors  : Bingqiang Zhou
- * @LastEditTime : 2023-08-15 22:23:08
+ * @LastEditTime : 2023-09-09 16:15:56
  * @Description  : 
 -->
 
@@ -66,7 +66,7 @@
 
 机器人届的“安卓”。
 
-![ROS与安卓](./ROSTutorials/Pictures/p01-ROS与安卓.png)
+![ROS与安卓](../Pictures/ROSTutorials/p01-ROS与安卓.png)
 
 ## 二、零基础，如何学习机器人操作系统ROS
 
@@ -90,7 +90,7 @@
 
 ## 三、学习ROS，安装Ubuntu，虚拟机和双系统如何选择
 
-![虚拟机和双系统优缺点对比](./ROSTutorials/Pictures/p02-%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%92%8C%E5%8F%8C%E7%B3%BB%E7%BB%9F%E4%BC%98%E7%BC%BA%E7%82%B9%E5%AF%B9%E6%AF%94.png)
+![虚拟机和双系统优缺点对比](../Pictures/ROSTutorials/p02-%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%92%8C%E5%8F%8C%E7%B3%BB%E7%BB%9F%E4%BC%98%E7%BC%BA%E7%82%B9%E5%AF%B9%E6%AF%94.png)
 
 博主建议使用双系统，一方面，连接硬件开发比较方便，另一方面，在ROS仿真平台进行实验对电脑性能有较高要求，不然容易卡。
 
@@ -104,7 +104,7 @@
 
 视频地址：[https://www.bilibili.com/video/BV1AP41157kT](https://www.bilibili.com/video/BV1AP41157kT)
 
-![Ubuntu使用入门](ROSTutorials/Pictures/p03-Ubuntu使用入门.png)
+![Ubuntu使用入门](../Pictures/ROSTutorials/p03-Ubuntu使用入门.png)
 
 ## 五、机器人操作系统ROS的安装心得以及rosdep问题的处理
 
@@ -219,7 +219,7 @@ source /opt/ros/humble/setup.bash
 
 自带的终端，当开启多个时，在操作时不是特别方便，而`Terminator`可以竖直、水平分割，即一个窗口中显示多个终端会相对方便一些，如下图所示。
 
-![Terminator](ROSTutorials/Pictures/p04-Terminator.jpg)
+![Terminator](../Pictures/ROSTutorials/p04-Terminator.jpg)
 
 如果有`Terminator`使用需求，可以看如下视频，还有视频中还有相关快捷键的讲解、以及消除输入法快捷键`Ctrl + shift + E`与`Terminator`快捷键的冲突。
 
@@ -279,7 +279,7 @@ Node节点是ROS的基础单元，可以看作是实现了一个功能点（一�
 
 博主使用群聊的例子，很形象的说明了Topic话题与Message消息，如下图所示。
 
-![Topic与Message](ROSTutorials/Pictures/p05-Topic与Message.png)
+![Topic与Message](../Pictures/ROSTutorials/p05-Topic与Message.png)
 
 **12.2、外延补充**
 
@@ -289,7 +289,7 @@ Node节点是ROS的基础单元，可以看作是实现了一个功能点（一�
 - 不同的传感器消息通常会拥有各自独立话题名称，每个话题只有一个发布者
 - 机器人速度指令话题通常会有多个发布者，但是同一时间只能有一个发言人
 
-![Topic与Message](ROSTutorials/Pictures/p06-Topic与Message-2.png)
+![Topic与Message](../Pictures/ROSTutorials/p06-Topic与Message-2.png)
 
 **12.3、Message消息类型**
 
@@ -557,19 +557,19 @@ C++与Python编写订阅者节点的步骤非常相似，如下所示。
 
 将机器人运动看做为矢量运动（前后、左右、上下平移）和旋转运动（滚转运动、俯仰运动、自转运动等）。
 
-![矢量坐标系](ROSTutorials/Pictures/p07-机器人运动.jpg)
+![矢量坐标系](../Pictures/ROSTutorials/p07-机器人运动.jpg)
 
 **18.1、矢量运动坐标系**
 
 以机器人底盘中心作为坐标系原地，伸出右手，以如下图所示，大拇指所指方向作为Z轴，食指所指方向作为X轴，中指所指方向作为Y轴。（运动单位为米每秒）
 
-![矢量坐标系](ROSTutorials/Pictures/p08-矢量坐标系.jpg)
+![矢量坐标系](../Pictures/ROSTutorials/p08-矢量坐标系.jpg)
 
 **18.2、旋转运动坐标系**
 
 伸出右手，大拇指指向X轴正方向，其他四个手指握拳的方向即是滚转运动的正方向，Y轴、Z轴类似，如下图所示。（运动单位为弧度每秒，$1$弧度 = $180 / \pi$ 度）
 
-![旋转运动坐标系](ROSTutorials/Pictures/p09-旋转运动坐标系.jpg)
+![旋转运动坐标系](../Pictures/ROSTutorials/p09-旋转运动坐标系.jpg)
 
 **18.3、速度控制消息包**
 
@@ -584,7 +584,7 @@ Vector3  angular
 
 速度控制节点发消息给速度控制话题`/cmd_vel`（约定俗成的名字）然后通过机器人核心节点控制机器人运动，如下图所示。
 
-![机器人控制流程](ROSTutorials/Pictures/p10-机器人控制流程.jpg)
+![机器人控制流程](../Pictures/ROSTutorials/p10-机器人控制流程.jpg)
 
 视频地址：[https://www.bilibili.com/video/BV1od4y1g7Ye](https://www.bilibili.com/video/BV1od4y1g7Ye)
 
@@ -746,7 +746,7 @@ if __name__ == "__main__":
 
 激光雷达数据获取流程如下图所示，激光雷达节点生成数据由模拟器生成，这里仅加入一个订阅者节点订阅雷达数据话题`/scan`即可。
 
-![雷达数据获取流程](ROSTutorials/Pictures/p11-雷达数据获取流程.jpg)
+![雷达数据获取流程](../Pictures/ROSTutorials/p11-雷达数据获取流程.jpg)
 
 大致流程如下：
 
@@ -828,7 +828,7 @@ if __name__ == "__main__":
 - 构建速度控制消息包 vel_cmd
 - 根据激光雷达的测距数值，实时调整机器人运动速度，避开障碍物
 
-![激光雷达避障流程](ROSTutorials/Pictures/p12-激光雷达避障流程.jpg)
+![激光雷达避障流程](../Pictures/ROSTutorials/p12-激光雷达避障流程.jpg)
 
 示例代码如下，示例代码也可以在`wpr_simulation/src/demo_lidar_behavior.cpp`中找到：
 
@@ -962,7 +962,7 @@ if __name__ == "__main__":
 
 **IMU数据获取步骤**
 
-![IMU数据获取流程](ROSTutorials/Pictures/p13-IMU数据获取流程.jpg)
+![IMU数据获取流程](../Pictures/ROSTutorials/p13-IMU数据获取流程.jpg)
 
 - 构建一个新的软件包，包名叫做`imu_pkg`
 - 在软件包中新建一个节点，节点名叫做`imu_node`
@@ -1074,7 +1074,7 @@ if __name__ == "__main__":
 
 **IMU航向锁定流程**
 
-![IMU航向锁定流程](ROSTutorials/Pictures/p14-IMU航向锁定流程.jpg)
+![IMU航向锁定流程](../Pictures/ROSTutorials/p14-IMU航向锁定流程.jpg)
 
 - 让大管家 NodeHandle 发布速度控制话题`/cmd_vel`
 - 设定一个目标朝向角，当姿态信息中的朝向角和目标朝向角不一致时，控制机器人转向目标朝向角
@@ -1356,12 +1356,12 @@ rosmsg show 包名/消息名
 
 - ROS中的栅格地图是正方形小格子组成的地图，每一个格子里面填入一个数值表示障碍物占据情况。
 
-![ROS中的栅格地图](ROSTutorials/Pictures/p15-ROS中的栅格地图.jpg)
+![ROS中的栅格地图](../Pictures/ROSTutorials/p15-ROS中的栅格地图.jpg)
 
 - 由ROS中`map_server`节点发送数据到`/map`话题，数据类型为`nav_msgs::OccupancyFrid`（占据栅格）,一般用100表示有障碍物占据，0表示没有障碍物占据，-1表示为未知状态
 - 栅格的尺寸越小，区域划分的越精细，如下图所示，对于一个固定大小的地图来说，栅格越小，则栅格的数量就越多，也就意味着地图的数据量就越大，处理的时候，计算量就越大，因此，一般会给栅格边长（地图分辨率）设置为一个适当的尺寸（ROS中栅格地图的默认分辨率是0.05米）
 
-![ROS中的栅格地图分辨率](ROSTutorials/Pictures/p16-ROS中的栅格地图分辨率.png)
+![ROS中的栅格地图分辨率](../Pictures/ROSTutorials/p16-ROS中的栅格地图分辨率.png)
 
 **栅格地图消息格式**
 
@@ -1376,7 +1376,7 @@ rosmsg show 包名/消息名
   - `geometry_msgs/Pose origin`, 地图原点，即地图中(0, 0)栅格与真实世界原点的偏差量[m_x, m_y, rad] (位移偏差单位：米，角度偏差单位：弧度)
 - `int8[] data`, 地图的数据，按照行优先的顺序，如下做所示，从栅格矩阵（左下角）的(0, 0)位置开始排列，栅格障碍物占据值的取值范围从0到100，如果栅格的障碍物状况未知，则栅格数据为-1
 
-![ROS中的栅格地图数据](ROSTutorials/Pictures/p17-ROS中的栅格地图数据.png)
+![ROS中的栅格地图数据](../Pictures/ROSTutorials/p17-ROS中的栅格地图数据.png)
 
 在实际应用中，ROS中的栅格地图是经过SLAM算法之后得到的结果。
 
@@ -1444,7 +1444,7 @@ int main(int argc, char** argv)
 
 完成以上步骤，即可显示地图，如下图所示
 
-![在RViz中显示栅格地图](ROSTutorials/Pictures/p18-在Rviz中显示栅格地图.jpg)
+![在RViz中显示栅格地图](../Pictures/ROSTutorials/p18-在Rviz中显示栅格地图.jpg)
 
 视频地址：[https://www.bilibili.com/video/BV1yG411G7ht](https://www.bilibili.com/video/BV1yG411G7ht)
 
@@ -1522,7 +1522,7 @@ SLAM, Simultaneous Localization And Mapping, 同时定位与地图构建，主�
 
 不难发现的是`Hector Mapping`算法仅使用了激光雷达数据，并且该算法没有使用里程计（什么是里程计将在 [第四十六节-里程计在激光雷达 SLAM 中的作用](#四十六里程计在激光雷达-slam-中的作用) 中讲到）。
 
-![使用SLAM算法软件包实现建图](./ROSTutorials/Pictures/p19-使用SLAM算法软件包实现建图.jpg)
+![使用SLAM算法软件包实现建图](../Pictures/ROSTutorials/p19-使用SLAM算法软件包实现建图.jpg)
 
 **Hector Mapping API文档**
 
@@ -1627,7 +1627,7 @@ SLAM, Simultaneous Localization And Mapping, 同时定位与地图构建，主�
 
 有时候，当仅有一个机器人时，设置不同的参数并不能很明显的看出差别来，为了更好的查看参数修改前后的变化，我们可以让两台机器人在同一场景中运行，分别进行SLAM建图，两者一对比就能看出差别来。
 
-![通过运行两个机器人查看设置不同参数的效果](ROSTutorials/Pictures/p20-通过运行两个机器人查看设置不同参数的效果.jpg)
+![通过运行两个机器人查看设置不同参数的效果](../Pictures/ROSTutorials/p20-通过运行两个机器人查看设置不同参数的效果.jpg)
 
 运行两个机器人的launch文件内容如下，也可以打开`wpr_simulation/launch/wpb_hector_comparison.launch`文件查看。
 
@@ -1708,7 +1708,7 @@ SLAM, Simultaneous Localization And Mapping, 同时定位与地图构建，主�
 
 设置的距离与角度更新阈值更小的机器人，地图更新更快，如下图所示。
 
-![通过运行两个机器人查看设置不同参数的效果](ROSTutorials/Pictures/p21-两个机器人设置不同参数的效果.jpg)
+![通过运行两个机器人查看设置不同参数的效果](../Pictures/ROSTutorials/p21-两个机器人设置不同参数的效果.jpg)
 
 视频地址：[https://www.bilibili.com/video/BV1dT4114741](https://www.bilibili.com/video/BV1dT4114741)
 
@@ -1716,19 +1716,19 @@ SLAM, Simultaneous Localization And Mapping, 同时定位与地图构建，主�
 
 TF是TransForm的缩写，指的是坐标变换，如下图所示，世界坐标系(map，一般是机器人运动的起点)与机器人(base_footprint，一般是机器人底盘中心)坐标系之间就存在一种变换关系：
 
-![坐标系之间的变换](ROSTutorials/Pictures/p22-坐标系之间的变换.jpg)
+![坐标系之间的变换](../Pictures/ROSTutorials/p22-坐标系之间的变换.jpg)
 
 **ROS的TF系统**
 
 在ROS中，TF发布节点，发布TF关系到`/tf`话题中，TF订阅节点就可以通过订阅`/tf`话题查询知道有那些坐标系以及坐标系之间的空间关系，例如`RViz`能够现实地图与机器人的相对位置，就是`RViz`订阅了`/tf`话题，在`RViz`中甚至可以显示各个TF坐标系。
 
-![ROS中的TF系统](ROSTutorials/Pictures/p23-ROS中的TF系统.jpg)
+![ROS中的TF系统](../Pictures/ROSTutorials/p23-ROS中的TF系统.jpg)
 
 **RViz中显示TF坐标系**
 
 在`RViz`中添加TF坐标系，并在Frames可以看到当前存在的所有坐标系。
 
-![RViz中显示TF坐标系](ROSTutorials/Pictures/p24-RViz中显示TF坐标系.jpg))
+![RViz中显示TF坐标系](../Pictures/ROSTutorials/p24-RViz中显示TF坐标系.jpg))
 
 **TF消息包类型**
 
@@ -1745,7 +1745,7 @@ TF是TransForm的缩写，指的是坐标变换，如下图所示，世界坐标
 
 运行命令`rosrun rqt_tf_tree rqt_tf_tree`
 
-![tf_tree查看坐标系关系](ROSTutorials/Pictures/p25-tf_tree查看坐标系关系.jpg)
+![tf_tree查看坐标系关系](../Pictures/ROSTutorials/p25-tf_tree查看坐标系关系.jpg)
 
 视频地址：[https://www.bilibili.com/video/BV1uh4y1377t](https://www.bilibili.com/video/BV1uh4y1377t)
 
@@ -1755,12 +1755,12 @@ TF是TransForm的缩写，指的是坐标变换，如下图所示，世界坐标
 
 里程计(odometry)在驱动节点中实现，发送到`/tf`话题中（在`tf_tree`中的`odom`坐标系）
 
-![里程计消息](ROSTutorials/Pictures/p26-里程计消息.jpg)
+![里程计消息](../Pictures/ROSTutorials/p26-里程计消息.jpg)
 
 里程计输出的位置信息，通过电机转速计算而来，只是一个理论值，在实际机器人运动中，可能存在机器人轮子打滑的情况，而这种情况就和实际的情况会存在一些偏差，而且随着运动的进行，误差会不断累加，这样就需要修正一下它（例如通过激光雷达点云的匹配修正位置，如下图所示），修正里程计误差的算法就是`Gmapping`的核心算法。
 
-![激光雷达点云修正1](ROSTutorials/Pictures/p27-激光雷达点云修正1.jpg)
-![激光雷达点云修正2](ROSTutorials/Pictures/p27-激光雷达点云修正2.jpg)
+![激光雷达点云修正1](../Pictures/ROSTutorials/p27-激光雷达点云修正1.jpg)
+![激光雷达点云修正2](../Pictures/ROSTutorials/p27-激光雷达点云修正2.jpg)
 
 在里程计的帮助下，激光雷达SLAM可以有效的克服了建图过程中位移特征缺失的问题。在实际的应用中，里程计的形式可能多种多样，甚至连SLAM输出的定位信息，都可能作为另外一个SLAM系统所需要的里程计，但是无论是什么样的形式，里程计的思想，归根结底，就是利用不同形式的定位方法去克服某种单一SLAM算法的缺陷，减少误差或者增加稳定性。
 
