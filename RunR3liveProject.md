@@ -2,7 +2,7 @@
  * @Author       : Bingqiang Zhou
  * @Date         : 2023-08-03 20:42:54
  * @LastEditors  : Bingqiang Zhou
- * @LastEditTime : 2023-09-09 00:46:00
+ * @LastEditTime : 2023-09-09 14:42:07
  * @Description  : 
 -->
 # 开源项目R3live的配置与运行
@@ -42,6 +42,12 @@ R3live是香港大学MARS实验室以Livox雷达为核心做的多传感器融�
     - [5.4、运行时，可能遇到的问题](#54运行时可能遇到的问题)
       - [5.4.1、Rviz进程终止运行](#541rviz进程终止运行)
       - [5.4.2、内存分配失败报错（内存不够）](#542内存分配失败报错内存不够)
+    - [5.5、可视化R3live RGB点云](#55可视化r3live-rgb点云)
+      - [5.5.1、构建网格与纹理](#551构建网格与纹理)
+      - [5.5.2、安装可视化工具](#552安装可视化工具)
+      - [5.5.3、可视化点云信息](#553可视化点云信息)
+      - [5.5.4、可视化重构的网格](#554可视化重构的网格)
+      - [5.5.5、pcd与ply文件格式](#555pcd与ply文件格式)
   - [附页](#附页)
     - [个人电脑配置与环境](#个人电脑配置与环境)
     - [参考链接](#参考链接)
@@ -493,6 +499,49 @@ export LIBGL_ALWAYS_SOFTWARE=1
 
 解决方案来自：[r3live/issues/11#issuecomment-1003692169](https://github.com/hku-mars/r3live/issues/11#issuecomment-1003692169)
 
+### 5.5、可视化R3live RGB点云
+
+在通过播放rosbag运行R3live时，可以按下“S”或者“s”，保存地图。默认会保存在`${HOME}/r3live_output`，通过运行作者写的`r3live_reconstruct_mesh.launch`可以将保存下来的rgb点云数据`rgb_pt.pcd`构建网格与纹理。
+
+#### 5.5.1、构建网格与纹理
+
+运行以下命令，默认构建`${HOME}/r3live_output`目录下的rgb点云(即运行时，不需要进入到存有结果的目录下)。
+
+```bash
+roslaunch r3live r3live_reconstruct_mesh.launch
+```
+
+#### 5.5.2、安装可视化工具
+
+```bash
+sudo apt-get install pcl-tools meshlab
+```
+
+#### 5.5.3、可视化点云信息
+
+```bash
+cd ${HOME}/r3live_output
+pcl_viewer rgb_pt.pcd
+```
+
+#### 5.5.4、可视化重构的网格
+
+```bash
+cd ${HOME}/r3live_output
+meshlab textured_mesh.ply
+```
+
+#### 5.5.5、pcd与ply文件格式
+
+pcd文件，包括头部属性与数据信息
+
+- 头部属性，包括一些pcd文件版本`VERSION`、每个点包含哪些维度`FIELDS`、每个维度的数据占用字节大小`SIZE`、每个维度的数据类型`TYPE`、每个维度含有多少个元素`COUNT`、用点的数量表示点云数据集的宽度`WIDTH`、用点云数据集中点的数量表示点云数据集的高度`HEIGHT`、指定数据集合中点的采集视点`VIEWPOINT`、点云中点的总数`POINTS`、点云数据的存储类型`DATA`等。
+- pcb文件中xyzrgb数据中的rgb用一个4个字节的`int`表示，每个字节以此表示`alpha`、`r`、`g`、`b`。
+
+ply文件格式，存在两种格式，（由点信息和平面信息构成）以及（由点信息、平面信息和边信息构成），其中点信息包括xyzrgb等属性，平面信息是由三角形构成，一般为一个或者两个，边信息，由两个点和颜色信息构成，用于分割两个三角形。
+
+ply文件格式中，两个三角形构成的平面信息由4个点构成，例如`0 1 2 3`表示两个三角形`0 1 2`与`0 2 3`构成的平面。这样构成主要是近可能的用少的点表示平面，参考[三角形扇形(Fans)、条形(Strips)和网格](https://zhuanlan.zhihu.com/p/402709877)
+
 ---
 参考链接：
 
@@ -500,6 +549,11 @@ export LIBGL_ALWAYS_SOFTWARE=1
 - [r3live_dataset](https://github.com/ziv-lin/r3live_dataset)
 - [ros中启动rviz显示段错误，核心以转储问题 rviz process has died](https://blog.csdn.net/CCCrunner/article/details/124826199)
 - [r3live/issues/11#issuecomment-1003692169](https://github.com/hku-mars/r3live/issues/11#issuecomment-1003692169)
+- [PCD文件格式](https://blog.csdn.net/a464057216/article/details/54864591)
+- [PCD（点云数据）文件格式](https://mnewbie.gitbooks.io/pcl-notes/content/chapter2.html)
+- [将.ply格式转换为.pcd格式](https://www.qiniu.com/qfans/qnso-51350493)
+- [PLY - Polygon File Format](https://paulbourke.net/dataformats/ply/)
+- [三角形扇形(Fans)、条形(Strips)和网格](https://zhuanlan.zhihu.com/p/402709877)
 
 ## 附页
 
@@ -530,3 +584,8 @@ export LIBGL_ALWAYS_SOFTWARE=1
 - [r3live_dataset](https://github.com/ziv-lin/r3live_dataset)
 - [ros中启动rviz显示段错误，核心以转储问题 rviz process has died](https://blog.csdn.net/CCCrunner/article/details/124826199)
 - [r3live/issues/11#issuecomment-1003692169](https://github.com/hku-mars/r3live/issues/11#issuecomment-1003692169)
+- [PCD文件格式](https://blog.csdn.net/a464057216/article/details/54864591)
+- [PCD（点云数据）文件格式](https://mnewbie.gitbooks.io/pcl-notes/content/chapter2.html)
+- [将.ply格式转换为.pcd格式](https://www.qiniu.com/qfans/qnso-51350493)
+- [PLY - Polygon File Format](https://paulbourke.net/dataformats/ply/)
+- [三角形扇形(Fans)、条形(Strips)和网格](https://zhuanlan.zhihu.com/p/402709877)
