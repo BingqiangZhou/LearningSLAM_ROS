@@ -2,7 +2,7 @@
  * @Author       : Bingqiang Zhou
  * @Date         : 2023-09-09 16:33:32
  * @LastEditors  : Bingqiang Zhou
- * @LastEditTime : 2023-09-10 00:49:10
+ * @LastEditTime : 2023-09-10 00:55:36
  * @Description  : 
 -->
 
@@ -479,6 +479,8 @@ tar xvzf Clash.for.Windows-XXXXX-x64-linux.tar.gz
 ```
 
 #### 3.3.2、设置订阅链接
+
+登录[socketpro网站](https://www.socketpro.info/en/home)，将其中`clash`托管链接填入到代理。
 
 - 將复制的Clash托管链接至`Profile`中下载配置
 
