@@ -2,14 +2,13 @@
  * @Author       : Bingqiang Zhou
  * @Date         : 2023-07-09 22:20:38
  * @LastEditors  : Bingqiang Zhou
- * @LastEditTime : 2023-09-09 16:35:52
+ * @LastEditTime : 2023-09-11 00:32:30
  * @Description  : 
 -->
 
 # SLAM_ROS学习笔记
 
 ## 一、SLAM学习笔记
-
 
 ## 二、ROS快速入门教程-笔记
 
@@ -19,7 +18,11 @@
 
 ### 3.1、R3live
 
-最近开始学习SLAM了，在看了ROS快速入门教程视频之后，尝试跑了一下开源项目[R3live](https://github.com/hku-mars/r3live)，跑通的过程记录在[RunR3liveProject.md](./Files/RunR3liveProject.md)中
+最近开始学习SLAM了，在看了ROS快速入门教程视频之后，尝试跑了一下开源项目[R3live](https://github.com/hku-mars/r3live)，跑通的过程记录在[RunR3liveProject.md](./Files/RunR3liveProject.md)中。
+
+### 3.2、OpenREALM
+
+老师的一个项目是在基于[OpenREALM](https://github.com/laxnpander/OpenREALM)上改进的，今天(230910)在宁同学的指导下，跑通了OpenREALM，这里记录一下过程[RunOpenREALM.md](./Files/RunOpenREALM.md)。
 
 ## 四、其他相关学习内容记录
 
