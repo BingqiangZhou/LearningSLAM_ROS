@@ -33,7 +33,6 @@
     - [5.1、下载并解压测试数据](#51下载并解压测试数据)
     - [5.2、修改roslaunch文件中输入数据路径](#52修改roslaunch文件中输入数据路径)
     - [5.3、启动roslaunch](#53启动roslaunch)
-    - [5.4、安装CUDA](#54安装cuda)
 
 <!-- /TOC -->
 
@@ -343,6 +342,12 @@ vim alexa_gnss.launch
 
 如下`launch`文件中部分内容所示，修改`config/input`参数的`value`为测试数据的路径。
 
+-----
+
+**注意：测试数据路径需要使用绝对路径，不要使用`~`代替用户主目录，会找不到图像而报错**
+
+-----
+
 ```XML
 <node pkg="realm_ros" type="realm_exiv2_grabber" name="realm_exiv2_grabber" output="screen">
     <param name="config/id" type="string" value="$(arg camera_id)"/>
@@ -373,7 +378,7 @@ roslaunch realm_ros alexa_reco.launch
 
 运行的结果输出在`OpenREALM_ROS1_Bridge/realm_ros/output`文件夹中相应时间目录下的`mosaicing`文件夹中，包括构建的地图、高程图（俯视图）等。
 
-
+<!-- 
 ### 5.4、安装CUDA
 
-在NVIDIA官网的[CUDA历史版本](https://developer.nvidia.com/cuda-toolkit-archive)中找到[CUDA 9.0](https://developer.nvidia.com/cuda-90-download-archive)
+在NVIDIA官网的[CUDA历史版本](https://developer.nvidia.com/cuda-toolkit-archive)中找到[CUDA 9.0](https://developer.nvidia.com/cuda-90-download-archive)，。 -->
