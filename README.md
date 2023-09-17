@@ -29,3 +29,7 @@
 ### 4.1、安装Windows、Ubuntu双系统记录
 
 之前一直在虚拟机下跑R3live，由于内存(8GB)限制，大的数据跑不起来，装了一下双系统，这里记录一下[DualSystem.md](./Files/DualSystem.md)，装系统的过程没什么太多好记录的，主要是想记录一下内核的切换以及安装驱动与应用等其他内容。
+
+### 4.2、一些SLAM相关的代码
+
+记录平时写的一些SLAM相关的代码。[CodeReadme.md](./Codes/CodeReadme.md)
