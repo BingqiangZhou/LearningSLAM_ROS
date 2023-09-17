@@ -66,10 +66,10 @@ R3live是香港大学MARS实验室以Livox雷达为核心做的多传感器融�
 
 ### 1.2、设置软件源
 
-将`packages.ros.org`加入到软件源
+~~将`packages.ros.org`加入到软件源~~
 
 ```bash
-sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+#sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 ```
 
 ros官方的源下载包会比较慢，可以改为中科院ros源。
