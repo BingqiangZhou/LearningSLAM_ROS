@@ -72,6 +72,29 @@ R3live是香港大学MARS实验室以Livox雷达为核心做的多传感器融�
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 ```
 
+ros官方的源下载包会比较慢，可以改为中科院ros源。
+
+- 导入key
+
+```bash
+gpg --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+gpg --export C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654 | sudo tee /usr/share/keyrings/ros.gpg > /dev/null
+```
+
+- 将软件源添加至系统
+
+```bash
+sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/ros.gpg] https://mirrors.ustc.edu.cn/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+```
+
+- 刷新软件源缓存
+
+```bash
+sudo apt update
+```
+
+参考链接： [中科院ROS源使用帮助](https://mirrors.ustc.edu.cn/help/ros.html)
+
 ### 1.3、添加软件包密钥
 
 这里没有安装`curl`软件包，也可以用`wget`下载(ubuntu自带)
