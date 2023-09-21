@@ -3,15 +3,14 @@
 <!-- TOC -->
 
 - [多传感器标定与时间同步](#多传感器标定与时间同步)
-  - [内置IMU的Livox激光雷达图](#内置imu的livox激光雷达图)
   - [问题1：Livox内置的IMU是否可以竖着放](#问题1livox内置的imu是否可以竖着放)
   - [问题2：Livox内置的IMU是否需要自己标定](#问题2livox内置的imu是否需要自己标定)
-  - [问题3：如果不要用内置IMU，外置IMU如何标定](#问题3如果不要用内置imu外置imu如何标定)
+  - [问题3：如果不使用内置IMU的雷达，外置IMU如何标定](#问题3如果不使用内置imu的雷达外置imu如何标定)
   - [问题4：如何进行时间同步](#问题4如何进行时间同步)
 
 <!-- /TOC -->
 
-## 内置IMU的Livox激光雷达图
+<!-- ## 内置IMU的Livox激光雷达图
 
 - AVIA 型号：
 
@@ -23,7 +22,7 @@
 
 - Tele-15型号
 
-![Tele-15](../Pictures/LivoxLidarImu_TimeSync/tele_Coordinate_System.png)
+![Tele-15](../Pictures/LivoxLidarImu_TimeSync/tele_Coordinate_System.png) -->
 
 
 ## 问题1：Livox内置的IMU是否可以竖着放
@@ -63,9 +62,11 @@ IMU内参标定，可参考链接：
 
 ## 问题2：Livox内置的IMU是否需要自己标定
 
-需要自己标定，见上面 [问题1：Livox内置的IMU是否可以竖着放](#问题1livox内置的imu是否可以竖着放)，当正常平放的时候，大概只需要减去一个重力加速度即可。
+需要自己标定，见上面 [问题1：Livox内置的IMU是否可以竖着放](#问题1livox内置的imu是否可以竖着放)，当正常平放的时候，大概只需要减去一个重力加速度即可。即如果雷达放在无人机上，X轴向下，此时IMU X轴也是朝下的，减去线性加速度1,0,0可抵消重力加速度影响（只是推理，有条件的话可进行实验求证）.
 
-## 问题3：如果不要用内置IMU，外置IMU如何标定
+![Horizon](../Pictures/LivoxLidarImu_TimeSync/Livox_Horizon_coordinate_system.png)
+
+## 问题3：如果不使用内置IMU的雷达，外置IMU如何标定
 
 根据问题1-2，外置IMU同样需要标定，标定IMU内参的方式可参考问题1中，IMU内参标定的参考链接。
 
