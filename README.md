@@ -33,3 +33,7 @@
 ### 4.2、一些SLAM相关的代码
 
 记录平时写的一些SLAM相关的代码。[CodeReadme.md](./Codes/CodeReadme.md)
+
+### 4.3、多传感器标定与时间同步
+
+了解了一下Livox雷达内置IMU是如何抵消重力加速度的影响的，以及多传感器标定与时间同步。[LivoxLiadarImu_TimeSync.md](./Files/LivoxLiadarImu_TimeSync.md)
