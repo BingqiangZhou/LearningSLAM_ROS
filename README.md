@@ -24,7 +24,7 @@
 
 老师的一个项目是在基于[OpenREALM](https://github.com/laxnpander/OpenREALM)上改进的，今天(230910)在宁同学的指导下，跑通了OpenREALM，这里记录一下过程[RunOpenREALM.md](./Files/RunOpenREALM.md)。
 
-基于`OpenREALM_ROS1_Bridge`环境，加入节点，模拟单飞行器定位建图过程与多飞行器定位建图过程，[SimulateSLAMBaseOpenREALM](./Files/SimulateSLAMBaseOpenREALM.md)。
+基于`OpenREALM_ROS1_Bridge`环境，加入节点，模拟单飞行器定位建图过程与多飞行器定位建图过程，[SimulateSLAMBaseOpenREALM.md](./Files/SimulateSLAMBaseOpenREALM.md)。
 
 ## 四、其他相关学习内容记录
 

@@ -23,7 +23,7 @@ def convert_mp4_to_jpgs(path, step, resize_ratio):
 
         still_reading, image = video_capture.read()
         frame_count += 1
-    print("Convert from mp4 to jpgs ended successfully!")
+    print("Convert from mp4 to jpgs ended successfully!", frame_count)
 
 def sort_key(e):
     file_name = os.path.split(e)[1]
@@ -31,13 +31,13 @@ def sort_key(e):
     return int(file_id)
 
 
-def convert_jpgs_to_gif(output_folder, step):
+def convert_jpgs_to_gif(output_folder, out_file_name, step):
     images = glob.glob(f"{output_folder}/*.jpg")
     images.sort(key=sort_key)
     # print(images[0:-1:step])
     frames = [Image.open(image) for image in images[0:-1:step]]
     frames_one = frames[0]
-    frames_one.save('converted_file.gif', format='GIF', append_images=frames,
+    frames_one.save(out_file_name+'.gif', format='GIF', append_images=frames,
                     save_all=True, duration=50, loop=0)
     print("Convert from jpgs to gif ended successfully!")
 
@@ -45,9 +45,11 @@ def convert_jpgs_to_gif(output_folder, step):
 if __name__ == "__main__":
     # print(sys.argv)
     your_file = sys.argv[1]
-    step = int(sys.argv[2])
-    convert_mp4_to_jpgs(your_file, step, 0.5)
-    convert_jpgs_to_gif('output', 1)
+    out_file_name = sys.argv[2]
+    step = int(sys.argv[3])
+    resize_ratio = float(sys.argv[4])
+    convert_mp4_to_jpgs(your_file, step, resize_ratio)
+    convert_jpgs_to_gif('output', out_file_name, 1)
 
     shutil.rmtree('output')
-    print("removed temp jpg files")
+    print("removed temp jpg files!")
