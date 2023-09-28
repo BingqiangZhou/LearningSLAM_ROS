@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+    <node pkg="realm_ros" type="simulate" name="simulate" output="screen">
+	    <param name="strInputImagePath" type="string" value="/home/bingqiangzhou/catkin_ws/src/OpenREALM_ROS1_Bridge/realm_ros/src/dom2.jpg"/>
+        <param name="bShowRestructMap" type="bool" value="false" />
+        <param name="strDataPathForSingle" type="string" value="/home/bingqiangzhou/catkin_ws/src/OpenREALM_ROS1_Bridge/realm_ros/src/data2.txt"/>
+        <param name="strDataPathForMutli" type="string" value="/home/bingqiangzhou/catkin_ws/src/OpenREALM_ROS1_Bridge/realm_ros/src/datam.txt"/>
+    </node>
+</launch>
